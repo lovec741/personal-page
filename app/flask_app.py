@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, session, redirect, url_for
 from datetime import datetime
 from app import assignments
 from flask_session import Session
-from cachelib import SimpleCache
+from cachelib import FileSystemCache
 import json
 
 from dotenv import load_dotenv
@@ -12,7 +12,7 @@ load_dotenv()
 
 app = Flask(__name__, static_folder='../static', template_folder='../templates')
 app.config["SESSION_TYPE"] = "cachelib"
-app.config['SESSION_CACHELIB'] = SimpleCache()
+app.config['SESSION_CACHELIB'] = FileSystemCache(os.path.join(os.path.dirname(__file__), '../cache'))
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 
 Session(app)

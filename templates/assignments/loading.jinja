@@ -30,7 +30,7 @@
         const inputs = [
             { name: 'username', value: username },
             { name: 'password', value: password },
-            { name: 'hiddenCourses', value: hiddenCourses }
+            { name: 'hiddenCourses', value: JSON.stringify(hiddenCourses) }
         ];
         
         inputs.forEach(input => {

@@ -41,7 +41,7 @@ def assignments_overview():
         else:
             return render_template("assignments/loading.jinja")
 
-    hidden_courses = set(json.loads(request.form["hiddenCourses"]))
+    hidden_courses = set(json.loads(request.form["hiddenCourses"])) if request.form["hiddenCourses"] else []
     name, topics, courses = assignments.get_all_topics_and_courses(request.form["username"], request.form["password"])
     if not name:
         return redirect(url_for("assignments_login", logout=1))

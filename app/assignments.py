@@ -11,10 +11,6 @@ import pickle
 import hashlib
 
 
-HIDE_COURSES = set([
-    "Úvod do počítačových sítí (St, 15:40, N1)"
-])
-
 CAS_URL = "https://idp.cuni.cz/cas/login?service={}"
 
 RECODEX_BASE_URL = "https://recodex.mff.cuni.cz"

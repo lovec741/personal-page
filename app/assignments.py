@@ -136,7 +136,7 @@ def get_topics_for_course(course: Dict[str, str], token):
             rows = topics_table.find_all('tr')
 
             for row in rows[1:]: # skip header
-                cells = row.find_all('td')              
+                cells = row.find_all('td')
                 
                 # topic name and link
                 topic_link = cells[0].find('a')
@@ -149,7 +149,7 @@ def get_topics_for_course(course: Dict[str, str], token):
                     date_time_part = deadline_text.split('(')[0].strip()
                     deadline = datetime.strptime(date_time_part, '%Y-%m-%d %H:%M')
 
-                    
+
                 points = cells[2].contents[0].strip() or "-"
                 points = float(points) if points != "-" else points
                 if isinstance(points, float) and points.is_integer():
@@ -188,7 +188,7 @@ def get_all_topics_and_courses(username, password, ignore_cache: bool = False):
             data = pickle.load(f)
         if not ignore_cache and hash in data and data[hash]["timestamp"] + timedelta(hours=1) > datetime.now():
             try:
-                print("Using cached topics data")                                        
+                print("Using cached topics data")
                 return data[hash]["name"], data[hash]["topics"], data[hash]["courses"], data[hash]["timestamp"]
             except (pickle.PickleError, EOFError, AttributeError) as e:
                 print(f"Error reading cache: {e}. Fetching fresh data...")
@@ -295,6 +295,6 @@ def recodex_get_topics_and_courses(token, user_id):
             topics.append(topic_data)
     return topics, courses
 
-def recodex_get_user_data(token, user_id):    
+def recodex_get_user_data(token, user_id):
     return recodex_api_request("GET", "/users/{}".format(user_id), token)
     

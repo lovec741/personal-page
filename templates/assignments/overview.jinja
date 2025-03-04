@@ -19,7 +19,7 @@
             {% set is_muted = topic.points != "-" or topic.acknowledged %}
             <tr>
                 <td {% if is_muted %}class="text-success"{% endif %}>{{ (topic.deadline - now).days }}d {{ (topic.deadline - now).seconds // 3600 }}h</td>
-                <td {% if is_muted %}class="text-success"{% endif %}>{{ topic.deadline.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td {% if is_muted %}class="text-success"{% endif %}>{{ topic.deadline.strftime('%d.%m.%Y %H:%M') }}</td>
                 <td {% if is_muted %}class="text-success"{% endif %}>{{ topic.points }}/{{ topic.max_points }}</td>
                 <td><a href="{{ topic.url }}" class="{% if is_muted %}link-success{%else%}link-light{% endif %}">{{ topic.name }}</a></td>
                 <td><a href="{{ topic.course.url }}" class="{% if is_muted %}link-success{%else%}link-light{% endif %}">{{ topic.course.name }}</a></td>
@@ -63,7 +63,7 @@
             {% set is_muted = topic.points != "-" or topic.acknowledged %}
             <tr>
                 <td {% if is_muted %}class="text-success"{% endif %}>{{ (topic.deadline - now).days }}d {{ (topic.deadline - now).seconds // 3600 }}h</td>
-                <td {% if is_muted %}class="text-success"{% endif %}>{{ topic.deadline.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td {% if is_muted %}class="text-success"{% endif %}>{{ topic.deadline.strftime('%d.%m.%Y %H:%M') }}</td>
                 <td {% if is_muted %}class="text-success"{% endif %}>{{ topic.points }}/{{ topic.max_points }}</td>
                 <td><a href="{{ topic.url }}" class="{% if is_muted %}link-success{%else%}link-light{% endif %}">{{ topic.name }}</a></td>
                 <td><a href="{{ topic.course.url }}" class="{% if is_muted %}link-success{%else%}link-light{% endif %}">{{ topic.course.name }}</a></td>
@@ -77,7 +77,7 @@
         <button class="btn btn-outline-light me-auto" type="button" data-bs-toggle="collapse" data-bs-target="#courseFilterCollapse" aria-expanded="false" aria-controls="courseFilterCollapse">
             Course Filter Settings
         </button>
-        <span>Data from {{ data_timestamp.strftime('%Y-%m-%d %H:%M') }}</span>
+        <span>Data from {{ data_timestamp.strftime('%d.%m.%Y %H:%M') }}</span>
         <button class="btn btn-outline-light ms-3" type="button" onclick="forceReload()">
             Force Reload Data
         </button>

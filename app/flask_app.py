@@ -29,25 +29,22 @@ def assignments_login():
 @app.route('/assignments', methods=["GET", "POST"])
 def assignments_overview():
     if request.method == "GET":
-        if "name" in session:
+        if "data" in session:
             now = datetime.now()
-            name = session.pop("name") 
-            topics = session.pop("topics") 
-            courses = session.pop("courses") 
+            (name, topics, courses, data_timestamp) = session.pop("data") 
             upcoming_topics = [topic for topic in topics if topic["deadline"] and topic["deadline"] > now]
             no_deadline_topics = [topic for topic in topics if not topic["deadline"]]
             old_topics = reversed([topic for topic in topics if topic["deadline"] and topic["deadline"] < now])
-            return render_template("assignments/overview.jinja", name=name, courses=courses, upcoming_topics=upcoming_topics, no_deadline_topics=no_deadline_topics, old_topics=old_topics, now=now)
+            return render_template("assignments/overview.jinja", name=name, courses=courses, upcoming_topics=upcoming_topics, no_deadline_topics=no_deadline_topics, old_topics=old_topics, now=now, data_timestamp=data_timestamp)
         else:
             return render_template("assignments/loading.jinja")
-
+    print(request.form)
     hidden_courses = set(json.loads(request.form["hiddenCourses"])) if request.form["hiddenCourses"] else []
-    name, topics, courses = assignments.get_all_topics_and_courses(request.form["username"], request.form["password"])
-    if not name:
+    name, topics, courses, timestamp = assignments.get_all_topics_and_courses(request.form["username"], request.form["password"], request.form["ignoreCache"] == "true")
+    if not name: # could fetch userdata from owl
         return redirect(url_for("assignments_login", logout=1))
-    session["name"] = name
-    session["topics"] = [topic for topic in topics if topic["course"]["url"] not in hidden_courses]
-    session["courses"] = courses
+    topics = [topic for topic in topics if topic["course"]["url"] not in hidden_courses]
+    session["data"] = (name, topics, courses, timestamp)
     return redirect(url_for("assignments_overview"))
 
 

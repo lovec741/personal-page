@@ -17,6 +17,9 @@
         const password = localStorage.getItem('password');
         const hiddenCourses = localStorage.getItem('hiddenCourses') || [];
         
+        const urlParams = new URLSearchParams(window.location.search);
+        const ignoreCache = urlParams.get('ignore_cache') === '1';
+        
         if (!username || !password) {
             window.location.href = '{{ url_for("assignments_login") }}';
             return;
@@ -30,7 +33,8 @@
         const inputs = [
             { name: 'username', value: username },
             { name: 'password', value: password },
-            { name: 'hiddenCourses', value: hiddenCourses }
+            { name: 'hiddenCourses', value: hiddenCourses },
+            { name: 'ignoreCache', value: ignoreCache }
         ];
         
         inputs.forEach(input => {

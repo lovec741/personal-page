@@ -73,12 +73,19 @@
 </table>
 
 <div class="mt-5 mb-4">
-    <button class="btn btn-outline-light" type="button" data-bs-toggle="collapse" data-bs-target="#courseFilterCollapse" aria-expanded="false" aria-controls="courseFilterCollapse">
-        Course Filter Settings
-    </button>
+    <div class="d-flex align-items-center">
+        <button class="btn btn-outline-light me-auto" type="button" data-bs-toggle="collapse" data-bs-target="#courseFilterCollapse" aria-expanded="false" aria-controls="courseFilterCollapse">
+            Course Filter Settings
+        </button>
+        <span>Data from {{ data_timestamp.strftime('%Y-%m-%d %H:%M') }}</span>
+        <button class="btn btn-outline-light ms-3" type="button" onclick="forceReload()">
+            Force Reload Data
+        </button>
+
+    </div>
     <div class="collapse mt-3" id="courseFilterCollapse">
         <div class="card card-body bg-dark border-light">
-            <h5>Hide Courses</h5>
+            <h5>Course Visibility</h5>
             <div id="courseCheckboxes">
                 {% for course in courses %}
                 <div class="form-check">
@@ -100,19 +107,23 @@
         
         const checkboxes = document.querySelectorAll('#courseCheckboxes input[type="checkbox"]');
         checkboxes.forEach(checkbox => {
-            if (hiddenCourses.includes(checkbox.value)) {
+            if (!hiddenCourses.includes(checkbox.value)) {
                 checkbox.checked = true;
             }
         });
     });
     
     function saveHiddenCourses() {
-        const checkboxes = document.querySelectorAll('#courseCheckboxes input[type="checkbox"]:checked');
+        const checkboxes = document.querySelectorAll('#courseCheckboxes input[type="checkbox"]:not(:checked)');
         const hiddenCourses = Array.from(checkboxes).map(checkbox => checkbox.value);
         
         localStorage.setItem('hiddenCourses', JSON.stringify(hiddenCourses));
         
         window.location.reload();
+    }
+
+    function forceReload() {
+        window.location.href = '{{ url_for("assignments_overview", ignore_cache=1) }}';
     }
 </script>
 

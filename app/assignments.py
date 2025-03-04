@@ -173,29 +173,29 @@ def get_topics_for_course(course: Dict[str, str], token):
                 topics.append(topic_data)
         return topics
 
-def get_all_topics_and_courses(username, password):     
-    cache_dir = os.path.expanduser("~/.cache/topics")
+def get_all_topics_and_courses(username, password, ignore_cache: bool = False):     
+    cache_dir = os.path.expanduser("~/.cache/mff_assignments")
     cache_file = os.path.join(cache_dir, "topics_cache.pkl")
 
     hash_obj = hashlib.sha256((username + password).encode())
     hash = hash_obj.hexdigest()
     
-    # Create cache directory if it doesn't exist
     os.makedirs(cache_dir, exist_ok=True)
     
-    # Check if cache exists and is less than 1 hour old
+    # check for cache
     if os.path.exists(cache_file):
         with open(cache_file, 'rb') as f:
             data = pickle.load(f)
-        if hash in data and data[hash]["timestamp"] < datetime.now() + timedelta(hours=1):
+        if not ignore_cache and hash in data and data[hash]["timestamp"] + timedelta(hours=1) > datetime.now():
             try:
                 print("Using cached topics data")                                        
-                return data[hash]["name"], data[hash]["topics"], data[hash]["courses"]
+                return data[hash]["name"], data[hash]["topics"], data[hash]["courses"], data[hash]["timestamp"]
             except (pickle.PickleError, EOFError, AttributeError) as e:
                 print(f"Error reading cache: {e}. Fetching fresh data...")
     else:
         data = {}
-    # If cache doesn't exist or is old, fetch fresh data
+
+    # no cache
     owl_token = cas_login_owl(username, password)
     if not owl_token:
         return None, None
@@ -218,21 +218,22 @@ def get_all_topics_and_courses(username, password):
     courses += recodex_courses
     topics.sort(key=lambda x: x['deadline'] or datetime(1970,1,1,1))
 
+    timestamp = datetime.now()
     data[hash] = {
         "topics": topics,
         "courses": courses,
         "name": name,
-        "timestamp": datetime.now()
+        "timestamp": timestamp
     }
-    # Cache the topics
+    # cache the data
     try:
         with open(cache_file, 'wb') as f:
             pickle.dump(data, f)
-        print("Topics cached successfully")
+        print("Cached successfully")
     except Exception as e:
-        print(f"Error caching topics: {e}")
+        print(f"Error caching: {e}")
 
-    return name, topics, courses
+    return name, topics, courses, timestamp
 
 def get_localized_text(texts):
     localized_text = None
@@ -276,7 +277,6 @@ def recodex_get_topics_and_courses(token, user_id):
             localized_text = get_localized_text(assignment["localizedTexts"])
             deadline_timestamp = assignment['firstDeadline']
             deadline = datetime.fromtimestamp(deadline_timestamp)
-            # if deadline > datetime.now():
             solutions = recodex_api_request("GET", "/exercise-assignments/{}/users/{}/solutions".format(assignment["id"], user_id), token)
             max_points = assignment['maxPointsBeforeFirstDeadline']
             points = "-"

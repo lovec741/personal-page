@@ -27,27 +27,8 @@
         {% endfor %}
     </tbody>
 </table>
-<h1 class="mb-4 mt-5">Without Deadlines</h1>
-<table class="table table-striped table-hover table-dark">
-    <thead class="table-dark">
-        <tr>
-            <th>Points</th>
-            <th>Topic</th>
-            <th>Course</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for topic in no_deadline_topics %}
-            {% set is_muted = topic.points != "-" or topic.acknowledged %}
-            <tr>
-                <td {% if is_muted %}class="text-success"{% endif %}>{{ topic.points }}/{{ topic.max_points }}</td>
-                <td><a href="{{ topic.url }}" class="{% if is_muted %}link-success{%else%}link-light{% endif %}">{{ topic.name }}</a></td>
-                <td><a href="{{ topic.course.url }}" class="{% if is_muted %}link-success{%else%}link-light{% endif %}">{{ topic.course.name }}</a></td>
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
-<h1 class="mb-4 mt-5">Old</h1>
+
+<h1 class="mb-4 mt-5">Past Deadlines</h1>
 <table class="table table-striped table-hover table-dark">
     <thead class="table-dark">
         <tr>
@@ -64,6 +45,27 @@
             <tr>
                 <td {% if is_muted %}class="text-success"{% endif %}>{{ (topic.deadline - now).days }}d {{ (topic.deadline - now).seconds // 3600 }}h</td>
                 <td {% if is_muted %}class="text-success"{% endif %}>{{ topic.deadline.strftime('%d.%m.%Y %H:%M') }}</td>
+                <td {% if is_muted %}class="text-success"{% endif %}>{{ topic.points }}/{{ topic.max_points }}</td>
+                <td><a href="{{ topic.url }}" class="{% if is_muted %}link-success{%else%}link-light{% endif %}">{{ topic.name }}</a></td>
+                <td><a href="{{ topic.course.url }}" class="{% if is_muted %}link-success{%else%}link-light{% endif %}">{{ topic.course.name }}</a></td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h1 class="mb-4 mt-5">Without Deadlines</h1>
+<table class="table table-striped table-hover table-dark">
+    <thead class="table-dark">
+        <tr>
+            <th>Points</th>
+            <th>Topic</th>
+            <th>Course</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for topic in no_deadline_topics %}
+            {% set is_muted = topic.points != "-" or topic.acknowledged %}
+            <tr>
                 <td {% if is_muted %}class="text-success"{% endif %}>{{ topic.points }}/{{ topic.max_points }}</td>
                 <td><a href="{{ topic.url }}" class="{% if is_muted %}link-success{%else%}link-light{% endif %}">{{ topic.name }}</a></td>
                 <td><a href="{{ topic.course.url }}" class="{% if is_muted %}link-success{%else%}link-light{% endif %}">{{ topic.course.name }}</a></td>

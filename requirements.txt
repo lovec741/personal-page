@@ -7,3 +7,4 @@ python-dotenv
 cachelib
 PyJWT
 lxml
+cryptography

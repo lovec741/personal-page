@@ -24,17 +24,32 @@
     function login() {
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
-                
-        localStorage.setItem('username', username);
-        localStorage.setItem('password', password);
-        
-        window.location.href = '{{ url_for("assignments_overview") }}';
+
+        fetch('/encrypt-password', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                password: password
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            const encryptedPassword = data.encrypted_password;
+            localStorage.setItem('username', username);
+            localStorage.setItem('encryptedPassword', encryptedPassword);
+            window.location.href = '{{ url_for("assignments_overview") }}';
+        })
+        .catch(error => {
+            alert("There was an error! Please contact the administrator.");
+        });
         return false; // prevent submission
     }
 
     function logout() {
         localStorage.removeItem('username');
-        localStorage.removeItem('password');
+        localStorage.removeItem('encryptedPassword');
         localStorage.removeItem('hiddenCourses');
         
         window.location.href = '{{ url_for("assignments_login" )}}';

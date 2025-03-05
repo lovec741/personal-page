@@ -1,56 +1,24 @@
 from datetime import datetime, timedelta
-from typing import Dict
+from typing import Dict, List, Set, Tuple
 import requests
 from bs4 import BeautifulSoup
 from http.cookies import SimpleCookie
 from urllib.parse import quote_plus, urlparse, parse_qs
 import jwt
-
-import os
-import pickle
-import hashlib
-
+from app.storage import UserStorage
 
 CAS_URL = "https://idp.cuni.cz/cas/login?service={}"
 
 RECODEX_BASE_URL = "https://recodex.mff.cuni.cz"
 OWL_BASE_URL = "https://owl.mff.cuni.cz"
 
-def cas_login_recodex(username, password):
-    cas_url = CAS_URL.format(RECODEX_BASE_URL+"/cas-auth-ext/") 
+CACHE_INVALIDATION_TIME_H = 1 
 
-    session = requests.session()
-    login_page = session.get(cas_url)
+class InvalidCredentialsException(Exception):
+    pass
 
-    soup = BeautifulSoup(login_page.text, "lxml")
-    form = soup.select("form#fm1")[0]
-
-    form_data = {}
-    for input in form.select("input"):
-        form_data[input["name"]] = input["value"] if input.has_attr("value") else ""
-
-    form_data.update({
-        "username": username,
-        "password": password
-    })
-
-    response = session.post(cas_url, data=form_data, allow_redirects=False)
-    ticket = parse_qs(urlparse(response.raw.get_redirect_location()).query)["ticket"][0]
-
-    url = RECODEX_BASE_URL+f"/cas-auth-ext/?ticket={quote_plus(ticket)}"
-    api_login_response = requests.get(url, allow_redirects=True)
-
-    parsed_url = urlparse(api_login_response.url)
-    query_params = parse_qs(parsed_url.query)
-    
-    sis_api_token = query_params['token'][0]
-    url = RECODEX_BASE_URL+"/api/v1/login/cas-uk"
-    api_login_response = requests.post(url, data={"token": sis_api_token})
-
-    return api_login_response.json()["payload"]["accessToken"]
-
-def cas_login_owl(username, password):
-    cas_url = CAS_URL.format(quote_plus(OWL_BASE_URL+"/acct/login/cas?next=/")) 
+def get_cas_ticket_for_service(username: str, password: str, cas_service_url: str):
+    cas_url = CAS_URL.format(quote_plus(cas_service_url)) 
 
     session = requests.session()
     login_page = session.get(cas_url)
@@ -69,232 +37,300 @@ def cas_login_owl(username, password):
 
     response = session.post(cas_url, data=form_data, allow_redirects=False)
     if response.status_code == 401:
-        return None
+        raise InvalidCredentialsException()
+
     ticket = parse_qs(urlparse(response.raw.get_redirect_location()).query)["ticket"][0]
+    return ticket
 
-    url = f"https://owl.mff.cuni.cz/acct/login/cas?next=/&ticket={quote_plus(ticket)}"
-    api_login_response = requests.get(url, allow_redirects=False)
 
-    # Extract the owl_session cookie from the response
-    cookies = api_login_response.cookies
-    token = None
-    
-    for cookie in cookies:
-        if cookie.name == 'owl_session':
-            token = cookie.value
-            print(f"Found owl_session cookie: {token}")
-            break
-    
-    
-    return token
+class OwlDataCollection:
+    def __init__(self, username: str, password: str, token: str|None):
+        self.token = token
+        self.session = requests.Session()
 
-def fetch_and_parse_owl_page(url, token):  
-    session = requests.Session()
-    cookie = SimpleCookie()
-    cookie["owl_session"] = token
-    session.cookies.update(cookie)
-    
-    response = session.get(url)
-    
-    if response.status_code == 200:
-        soup = BeautifulSoup(response.text, 'html.parser')
-        return soup
-    else:
-        print(f"Failed to fetch the page. Status code: {response.status_code}")
-        return None
-
-def get_this_semester_courses(token):
-    soup = fetch_and_parse_owl_page(OWL_BASE_URL+"/", token)
-    if soup:
-        header = soup.find('header')
-        if header and header.find_next_sibling() and header.find_next_sibling().find_next_sibling():
-            ul = header.find_next_sibling().find_next_sibling()
-            courses = []
-            if ul.name == 'ul':
-                for li in ul.find_all('li', recursive=True)[:-1]:
-                    link = li.find('a')
-                    if link:
-                        course_url = link.get('href')
-                        course_name = link.text.strip()
-                                            
-                        courses.append({
-                            'name': course_name,
-                            'url': OWL_BASE_URL+course_url,
-                        })
-            return courses
+        if not token or not self._test_token(): # no token or invalid token
+            print("OWL Getting new token")
+            self.token = self._get_token(username, password)
         else:
-            print("No header found or no element after header")
+            print("OWL Reusing token")
+
+    @staticmethod
+    def _get_token(username: str, password: str):
+        ticket = get_cas_ticket_for_service(username, password, OWL_BASE_URL+"/acct/login/cas?next=/")
+        
+        url = OWL_BASE_URL+f"/acct/login/cas?next=/&ticket={quote_plus(ticket)}"
+        api_login_response = requests.get(url, allow_redirects=False)
+
+        cookies = api_login_response.cookies
+        token = None
+        for cookie in cookies:
+            if cookie.name == 'owl_session':
+                token = cookie.value
+                break
+
+        if not token:
+            raise Exception("owl no cookie found")
+        
+        return token
+    
+    def _test_token(self):
+        response = self._fetch_owl_page(OWL_BASE_URL+"/settings/", False)
+        if response.status_code == 302 and "login" in response.headers.get("Location", ""):
+            return False
+        return True
+    
+    def _fetch_owl_page(self, url: str, allow_redirects=True):
+        cookie = SimpleCookie()
+        cookie["owl_session"] = self.token
+        self.session.cookies.update(cookie)
+        response = self.session.get(url, allow_redirects=allow_redirects)
+        return response
+            
+    def _fetch_and_parse_owl_page(self, url: str):  
+        response = self._fetch_owl_page(url)
+        
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.text, 'html.parser')
+            return soup
+        else:
+            print(f"Failed to fetch the page. Status code: {response.status_code}")
             return None
 
-def get_topics_for_course(course: Dict[str, str], token):
-    soup = fetch_and_parse_owl_page(course['url'], token)
-    if soup:
+    def get_this_semester_courses(self):
+        soup = self._fetch_and_parse_owl_page(OWL_BASE_URL+"/")
+        if soup:
+            header = soup.find('header')
+            if header and header.find_next_sibling() and header.find_next_sibling().find_next_sibling():
+                ul = header.find_next_sibling().find_next_sibling()
+                courses = []
+                if ul.name == 'ul':
+                    for li in ul.find_all('li', recursive=True)[:-1]:
+                        link = li.find('a')
+                        if link:
+                            course_url = link.get('href')
+                            course_name = link.text.strip()
+                                                
+                            courses.append({
+                                'name': course_name,
+                                'url': OWL_BASE_URL+course_url,
+                            })
+                return courses
+            else:
+                print("No header found or no element after header")
+                return None
+
+    def get_topics_for_course(self, course: Dict[str, str]):
+        soup = self._fetch_and_parse_owl_page(course['url'])
+        if soup:
+            topics = []
+            topics_tables = soup.find_all('table', class_='topics')
+            for topics_table in topics_tables:
+
+                rows = topics_table.find_all('tr')
+
+                for row in rows[1:]: # skip header
+                    cells = row.find_all('td')
+                    
+                    topic_link = cells[0].find('a')
+                    topic_name = topic_link.text
+                    topic_url = topic_link['href']
+                    
+                    deadline = None
+                    deadline_text = cells[1].contents[0].strip()
+                    if deadline_text:
+                        date_time_part = deadline_text.split('(')[0].strip()
+                        deadline = datetime.strptime(date_time_part, '%Y-%m-%d %H:%M')
+
+
+                    points = cells[2].contents[0].strip() or "-"
+                    points = float(points) if points != "-" else points
+                    if isinstance(points, float) and points.is_integer():
+                        points = int(points)
+                    
+                    max_points = cells[3].contents[0].strip() or "?"
+                    max_points = float(max_points) if max_points != "?" else max_points
+                    if isinstance(max_points, float) and max_points.is_integer():
+                        max_points = int(max_points)
+                    
+                    topic_data = {
+                        'course': course,
+                        'name': topic_name,
+                        'url': OWL_BASE_URL+topic_url,
+                        'deadline': deadline,
+                        'points': points,
+                        'max_points': max_points,
+                        'acknowledged': row.get('class')[0] == "told"
+                    }
+                    
+                    topics.append(topic_data)
+            return topics
+    
+    def get_topics_and_courses(self, hidden_courses: Set):
+        courses = self.get_this_semester_courses()
         topics = []
-        topics_tables = soup.find_all('table', class_='topics')
-        for topics_table in topics_tables:
+        for course in courses:
+            if course["url"] in hidden_courses: # dont fetch data for hidden courses
+                continue
 
-            rows = topics_table.find_all('tr')
-
-            for row in rows[1:]: # skip header
-                cells = row.find_all('td')
-                
-                # topic name and link
-                topic_link = cells[0].find('a')
-                topic_name = topic_link.text
-                topic_url = topic_link['href']
-                
-                deadline = None
-                deadline_text = cells[1].contents[0].strip()
-                if deadline_text:
-                    date_time_part = deadline_text.split('(')[0].strip()
-                    deadline = datetime.strptime(date_time_part, '%Y-%m-%d %H:%M')
+            course_topics = self.get_topics_for_course(course)
+            if course_topics:
+                topics += course_topics
+        return topics, courses
 
 
-                points = cells[2].contents[0].strip() or "-"
-                points = float(points) if points != "-" else points
-                if isinstance(points, float) and points.is_integer():
-                    points = int(points)
-                
-                max_points = cells[3].contents[0].strip() or "?"
-                max_points = float(max_points) if max_points != "?" else max_points
-                if isinstance(max_points, float) and max_points.is_integer():
-                    max_points = int(max_points)
-                
+class RecodexDataCollection:
+    def __init__(self, username: str, password: str, token: str|None):
+        self.token = token
+        self.user_id = self._get_user_id() if token else None
+        self.session = requests.Session()
+
+        self.user_data = None
+        if token and self.user_id: # have token and token could be parsed (because have user_id)
+            self.user_data = self._get_user_data() # test token by getting user data
+        
+        if not self.user_data: # no token or invalid token
+            print("RECODEX Getting new token")
+            self.token = self._get_token(username, password)
+            self.user_id = self._get_user_id()
+            self.user_data = self._get_user_data()
+        else:
+            print("RECODEX Reusing token")
+
+    @staticmethod
+    def _get_token(username: str, password: str):
+        ticket = get_cas_ticket_for_service(username, password, RECODEX_BASE_URL+"/cas-auth-ext/")
+
+        url = RECODEX_BASE_URL+f"/cas-auth-ext/?ticket={quote_plus(ticket)}"
+        api_login_response = requests.get(url, allow_redirects=True)
+
+        parsed_url = urlparse(api_login_response.url)
+        query_params = parse_qs(parsed_url.query)
+        
+        sis_api_token = query_params['token'][0]
+        url = RECODEX_BASE_URL+"/api/v1/login/cas-uk"
+        api_login_response = requests.post(url, data={"token": sis_api_token})
+
+        return api_login_response.json()["payload"]["accessToken"]
+
+    @staticmethod
+    def _get_localized_text(texts: List[Dict]):
+        localized_text = None
+        for text in texts:
+            if text.get('locale') == 'cs':
+                localized_text = text
+                break
+        
+        if localized_text is None:
+            for text in texts:
+                if text.get('locale') == 'en':
+                    localized_text = text
+                    break
+        
+        if localized_text is None and texts:
+            localized_text = texts[0]
+        return localized_text
+
+    def _api_request(self, method: str, endpoint: str):
+        headers = {"Authorization": "Bearer " + self.token}
+        resp = self.session.request(method, RECODEX_BASE_URL+"/api/v1"+endpoint, headers=headers)
+        if resp.status_code == 401:
+            return None
+        return resp.json()["payload"]
+
+    def get_topics_and_courses(self, hidden_courses: Set):    
+        groups = self._api_request("GET", "/groups")
+        
+        topics = []
+        courses = []
+        for group in groups:
+            group_localized_text = self._get_localized_text(group["localizedTexts"])
+            group_id = group.get('id')
+            course = {
+                'name': group_localized_text.get('name'),
+                'url': RECODEX_BASE_URL+f"/app/group/{group_id}/assignments",
+            }
+            courses.append(course)
+
+            if course["url"] in hidden_courses: # dont fetch data for hidden courses
+                continue
+
+            assignments = self._api_request("GET", "/groups/{}/assignments".format(group_id))
+            
+            for i, assignment in enumerate(assignments, 1):
+                localized_text = self._get_localized_text(assignment["localizedTexts"])
+                deadline_timestamp = assignment['firstDeadline']
+                deadline = datetime.fromtimestamp(deadline_timestamp)
+                solutions = self._api_request("GET", "/exercise-assignments/{}/users/{}/solutions".format(assignment["id"], self.user_id))
+                max_points = assignment['maxPointsBeforeFirstDeadline']
+                points = "-"
+                for solution in solutions:
+                    if solution["isBestSolution"]:
+                        points = str(solution["actualPoints"]) + ("" if solution["bonusPoints"] == 0 else f"+{solution['bonusPoints']}")
                 topic_data = {
                     'course': course,
-                    'name': topic_name,
-                    'url': OWL_BASE_URL+topic_url,
+                    'name': localized_text.get('name'),
+                    'url': RECODEX_BASE_URL+f"/app/assignment/{assignment['id']}/user/{self.user_id}",
                     'deadline': deadline,
                     'points': points,
                     'max_points': max_points,
-                    'acknowledged': row.get('class')[0] == "told"
+                    'acknowledged': False
                 }
-                
                 topics.append(topic_data)
-        return topics
+        return topics, courses
 
-def get_all_topics_and_courses(username, password, ignore_cache: bool = False):     
-    cache_dir = os.path.expanduser("~/.cache/mff_assignments")
-    cache_file = os.path.join(cache_dir, "topics_cache.pkl")
+    def _get_user_data(self):
+        return self._api_request("GET", "/users/{}".format(self.user_id))
 
-    hash_obj = hashlib.sha256((username + password).encode())
-    hash = hash_obj.hexdigest()
-    
-    os.makedirs(cache_dir, exist_ok=True)
-    
+    def _get_user_id(self):
+        try:
+            decoded_token = jwt.decode(self.token, options={"verify_signature": False})
+            user_id = decoded_token["sub"]
+            return user_id
+        except Exception:
+            return None
+
+
+def get_all_topics_and_courses(username: str, password: str, ignore_cache: bool = False) -> Tuple[Dict, Dict]:        
+    user_storage = UserStorage(username, password)
+    user_data = user_storage.load_user_data()
+
+    settings = user_data.get("settings", {})
+    hidden_courses = set(settings.get("hidden_courses", []))
+
     # check for cache
-    if os.path.exists(cache_file):
-        with open(cache_file, 'rb') as f:
-            data = pickle.load(f)
-        if not ignore_cache and hash in data and data[hash]["timestamp"] + timedelta(hours=1) > datetime.now():
-            try:
-                print("Using cached topics data")
-                return data[hash]["name"], data[hash]["topics"], data[hash]["courses"], data[hash]["timestamp"]
-            except (pickle.PickleError, EOFError, AttributeError) as e:
-                print(f"Error reading cache: {e}. Fetching fresh data...")
-    else:
-        data = {}
+    if not ignore_cache and user_data.get("cache") \
+        and user_data["cache"]["timestamp"] + timedelta(hours=CACHE_INVALIDATION_TIME_H) > datetime.now():
+            print("Using cached topics data")
+            return user_data["cache"], settings
 
     # no cache
-    owl_token = cas_login_owl(username, password)
-    if not owl_token:
+    try:
+        owl = OwlDataCollection(username, password, user_data.get("owl_token"))
+        recodex = RecodexDataCollection(username, password, user_data.get("recodex_token"))
+    except InvalidCredentialsException:
         return None, None
-    recodex_token = cas_login_recodex(username, password)
 
-    decoded_token = jwt.decode(recodex_token, options={"verify_signature": False})
-    user_id = decoded_token["sub"]
-    name = recodex_get_user_data(recodex_token, user_id)["fullName"]
+    name = recodex.user_data["fullName"]
 
-    courses = get_this_semester_courses(owl_token)
-    topics = []
-    for course in courses:
-        course_topics = get_topics_for_course(course, owl_token)
-        if course_topics:
-            topics += course_topics
+    recodex_topics, recodex_courses = recodex.get_topics_and_courses(hidden_courses)
+    owl_topics, owl_courses = owl.get_topics_and_courses(hidden_courses)
+    topics = recodex_topics + owl_topics
+    courses = recodex_courses + owl_courses
 
-    recodex_topics, recodex_courses = recodex_get_topics_and_courses(recodex_token, user_id)
-    if recodex_topics:
-        topics += recodex_topics
-    courses += recodex_courses
     topics.sort(key=lambda x: x['deadline'] or datetime(1970,1,1,1))
+    courses.sort(key=lambda x: x['name'])
 
-    timestamp = datetime.now()
-    data[hash] = {
+    data = {
         "topics": topics,
         "courses": courses,
         "name": name,
-        "timestamp": timestamp
+        "timestamp": datetime.now(),
+        "hidden_courses": hidden_courses
     }
-    # cache the data
-    try:
-        with open(cache_file, 'wb') as f:
-            pickle.dump(data, f)
-        print("Cached successfully")
-    except Exception as e:
-        print(f"Error caching: {e}")
-
-    return name, topics, courses, timestamp
-
-def get_localized_text(texts):
-    localized_text = None
-    for text in texts:
-        if text.get('locale') == 'cs':
-            localized_text = text
-            break
     
-    if localized_text is None:
-        for text in texts:
-            if text.get('locale') == 'en':
-                localized_text = text
-                break
-    
-    if localized_text is None and texts:
-        localized_text = texts[0]
-    return localized_text
+    user_data["cache"] = data
+    user_data["owl_token"] = owl.token
+    user_data["recodex_token"] = recodex.token
+    user_storage.save_user_data(user_data)
 
-def recodex_api_request(method, endpoint, token):
-    headers = {"Authorization": "Bearer " + token}
-    resp = requests.request(method, RECODEX_BASE_URL+"/api/v1"+endpoint, headers=headers)
-    return resp.json()["payload"]
-
-def recodex_get_topics_and_courses(token, user_id):    
-    groups = recodex_api_request("GET", "/groups", token)
-    
-    topics = []
-    courses = []
-    for group in groups:
-        group_localized_text = get_localized_text(group["localizedTexts"])
-        group_id = group.get('id')
-        course = {
-            'name': group_localized_text.get('name'),
-            'url': RECODEX_BASE_URL+f"/app/group/{group_id}/assignments",
-        }
-        courses.append(course)
-
-        assignments = recodex_api_request("GET", "/groups/{}/assignments".format(group_id), token)
-        
-        for i, assignment in enumerate(assignments, 1):
-            localized_text = get_localized_text(assignment["localizedTexts"])
-            deadline_timestamp = assignment['firstDeadline']
-            deadline = datetime.fromtimestamp(deadline_timestamp)
-            solutions = recodex_api_request("GET", "/exercise-assignments/{}/users/{}/solutions".format(assignment["id"], user_id), token)
-            max_points = assignment['maxPointsBeforeFirstDeadline']
-            points = "-"
-            for solution in solutions:
-                if solution["isBestSolution"]:
-                    points = str(solution["actualPoints"]) + ("" if solution["bonusPoints"] == 0 else f"+{solution['bonusPoints']}")
-            topic_data = {
-                'course': course,
-                'name': localized_text.get('name'),
-                'url': RECODEX_BASE_URL+f"/app/assignment/{assignment['id']}/user/{user_id}",
-                'deadline': deadline,
-                'points': points,
-                'max_points': max_points,
-                'acknowledged': False
-            }
-            topics.append(topic_data)
-    return topics, courses
-
-def recodex_get_user_data(token, user_id):
-    return recodex_api_request("GET", "/users/{}".format(user_id), token)
-    
+    return data, user_data.get("settings", {})

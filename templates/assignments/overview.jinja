@@ -91,7 +91,7 @@
             <div id="courseCheckboxes">
                 {% for course in courses %}
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="{{ course.url }}" id="course-{{ loop.index }}">
+                    <input class="form-check-input" type="checkbox" value="{{ course.url }}" id="course-{{ loop.index }}" {% if course.url not in hidden_courses %}checked{% endif %}>
                     <label class="form-check-label" for="course-{{ loop.index }}">
                         {{ course.name }}
                     </label>
@@ -104,24 +104,29 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const hiddenCourses = JSON.parse(localStorage.getItem('hiddenCourses') || '[]');
-        
-        const checkboxes = document.querySelectorAll('#courseCheckboxes input[type="checkbox"]');
-        checkboxes.forEach(checkbox => {
-            if (!hiddenCourses.includes(checkbox.value)) {
-                checkbox.checked = true;
-            }
-        });
-    });
-    
     function saveHiddenCourses() {
         const checkboxes = document.querySelectorAll('#courseCheckboxes input[type="checkbox"]:not(:checked)');
         const hiddenCourses = Array.from(checkboxes).map(checkbox => checkbox.value);
         
-        localStorage.setItem('hiddenCourses', JSON.stringify(hiddenCourses));
-        
-        window.location.reload();
+        fetch('{{ url_for("save_settings_endpoint") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                username: localStorage.getItem('username'),
+                encryptedPassword: localStorage.getItem('encryptedPassword'),
+                settings: {
+                    hidden_courses: hiddenCourses
+                }
+            })
+        }).then(response => {
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                alert('Failed to save settings');
+            }
+        });
     }
 
     function forceReload() {

@@ -5,3 +5,4 @@
 /cache
 
 .env
+**/user_data.pkl

@@ -1,16 +1,15 @@
-from flask import Flask, render_template, request, session, redirect, url_for, jsonify
+from flask import Flask, abort, render_template, request, session, redirect, url_for, jsonify
 from datetime import datetime
-from app import assignments
 from flask_session import Session
 from cachelib import FileSystemCache
-import json
 from cryptography.fernet import Fernet
 import base64
 import hashlib
-
-
 from dotenv import load_dotenv
 import os
+
+from app.storage import UserStorage
+from app import assignments
 
 load_dotenv()
 
@@ -29,28 +28,66 @@ def index():
 def assignments_login():
     return render_template("assignments/login.jinja")
 
-
 @app.route('/assignments', methods=["GET", "POST"])
 def assignments_overview():
     if request.method == "GET":
-        if "data" in session:
+        if "data" in session or "settings" in session:
             now = datetime.now()
-            (name, topics, courses, data_timestamp) = session.pop("data") 
+            data = session.pop("data")
+            settings = session.pop("settings")
+            topics = data["topics"]
             upcoming_topics = [topic for topic in topics if topic["deadline"] and topic["deadline"] > now]
             no_deadline_topics = [topic for topic in topics if not topic["deadline"]]
             old_topics = reversed([topic for topic in topics if topic["deadline"] and topic["deadline"] < now])
-            return render_template("assignments/overview.jinja", name=name, courses=courses, upcoming_topics=upcoming_topics, no_deadline_topics=no_deadline_topics, old_topics=old_topics, now=now, data_timestamp=data_timestamp)
+            return render_template(
+                "assignments/overview.jinja",
+                name=data["name"],
+                courses=data["courses"],
+                upcoming_topics=upcoming_topics,
+                no_deadline_topics=no_deadline_topics,
+                old_topics=old_topics,
+                now=now,
+                data_timestamp=data["timestamp"],
+                hidden_courses=settings.get("hidden_courses", [])
+            )
         else:
             return render_template("assignments/loading.jinja")
     
-    hidden_courses = set(json.loads(request.form["hiddenCourses"])) if request.form["hiddenCourses"] else []
+    username = request.form["username"]
     password = decrypt_password(request.form["encryptedPassword"])
-    name, topics, courses, timestamp = assignments.get_all_topics_and_courses(request.form["username"], password, request.form["ignoreCache"] == "true")
-    if not name: # could fetch userdata from owl
+    if not password:
+        abort(401)
+
+    data, settings = assignments.get_all_topics_and_courses(username, password, request.form["ignoreCache"] == "true")
+    if not data: # invalid credentials (couldnt get tokens)
         return redirect(url_for("assignments_login", logout=1))
-    topics = [topic for topic in topics if topic["course"]["url"] not in hidden_courses]
-    session["data"] = (name, topics, courses, timestamp)
+    data["topics"] = [topic for topic in data["topics"] if topic["course"]["url"] not in settings.get("hidden_courses", [])]
+    session["data"] = data
+    session["settings"] = settings
     return redirect(url_for("assignments_overview"))
+
+@app.route('/assignments/save-settings', methods=["POST"])
+def save_settings_endpoint():
+    data = request.get_json()
+    username = data.get("username")
+    password = decrypt_password(data.get("encryptedPassword"))
+    if not password:
+        abort(401)
+    settings = data.get("settings")
+
+    user_storage = UserStorage(username, password)
+    user_data = user_storage.load_user_data()
+    if "cache" in user_data:
+        new_hidden_courses = set(settings.get("hidden_courses", []))
+        cache_hidden_courses = set(user_data["cache"].get("hidden_courses", []))
+
+        unhidden_courses = cache_hidden_courses - new_hidden_courses
+        if unhidden_courses: # invalidate cache
+            print("Some hidden courses were unhidden, invalidating cache")
+            user_data.pop("cache")
+    user_data["settings"] = settings
+    user_storage.save_user_data(user_data)
+    return ""
 
 def get_encryption_key():
     digest = hashlib.sha256(app.config["SECRET_KEY"].encode()).digest()
@@ -71,7 +108,7 @@ def decrypt_password(encrypted_password):
     except Exception:
         return None
 
-@app.route('/encrypt-password', methods=["POST"])
+@app.route('/assignments/encrypt-password', methods=["POST"])
 def encrypt_password_endpoint():   
     data = request.get_json()
     password = data.get("password")    

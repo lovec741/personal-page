@@ -118,7 +118,17 @@ class OwlDataCollection:
             else:
                 print("No header found or no element after header")
                 return None
-
+    
+    @staticmethod
+    def _convert_points(points: str, default: str="-") -> int|float|str:
+        try:
+            points = float(points)
+        except ValueError:
+            points = default
+        if isinstance(points, float) and points.is_integer():
+            points = int(points)
+        return points
+    
     def get_topics_for_course(self, course: Dict[str, str]):
         soup = self._fetch_and_parse_owl_page(course['url'])
         if soup:
@@ -142,15 +152,8 @@ class OwlDataCollection:
                         deadline = datetime.strptime(date_time_part, '%Y-%m-%d %H:%M')
 
 
-                    points = cells[2].contents[0].strip() or "-"
-                    points = float(points) if points != "-" else points
-                    if isinstance(points, float) and points.is_integer():
-                        points = int(points)
-                    
-                    max_points = cells[3].contents[0].strip() or "?"
-                    max_points = float(max_points) if max_points != "?" else max_points
-                    if isinstance(max_points, float) and max_points.is_integer():
-                        max_points = int(max_points)
+                    points = self._convert_points(cells[2].contents[0].strip(), "-")
+                    max_points = self._convert_points(cells[3].contents[0].strip(), "?")
                     
                     topic_data = {
                         'course': course,

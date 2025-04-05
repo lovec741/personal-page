@@ -6,6 +6,9 @@ from http.cookies import SimpleCookie
 from urllib.parse import quote_plus, urlparse, parse_qs
 import jwt
 from app.storage import UserStorage
+from zoneinfo import ZoneInfo
+
+TIMEZONE = ZoneInfo("Europe/Prague")
 
 CAS_URL = "https://idp.cuni.cz/cas/login?service={}"
 
@@ -150,6 +153,7 @@ class OwlDataCollection:
                     if deadline_text:
                         date_time_part = deadline_text.split('(')[0].strip()
                         deadline = datetime.strptime(date_time_part, '%Y-%m-%d %H:%M')
+                        deadline = deadline.replace(tzinfo=TIMEZONE)
 
 
                     points = self._convert_points(cells[2].contents[0].strip(), "-")
@@ -262,7 +266,7 @@ class RecodexDataCollection:
             for i, assignment in enumerate(assignments, 1):
                 localized_text = self._get_localized_text(assignment["localizedTexts"])
                 deadline_timestamp = assignment['firstDeadline']
-                deadline = datetime.fromtimestamp(deadline_timestamp)
+                deadline = datetime.fromtimestamp(deadline_timestamp, TIMEZONE)
                 solutions = self._api_request("GET", "/exercise-assignments/{}/users/{}/solutions".format(assignment["id"], self.user_id))
                 max_points = assignment['maxPointsBeforeFirstDeadline']
                 points = "-"
@@ -302,7 +306,8 @@ def get_all_topics_and_courses(username: str, password: str, ignore_cache: bool 
 
     # check for cache
     if not ignore_cache and user_data.get("cache") \
-        and user_data["cache"]["timestamp"] + timedelta(hours=CACHE_INVALIDATION_TIME_H) > datetime.now():
+        and user_data["cache"]["timestamp"].tzinfo is not None \
+        and user_data["cache"]["timestamp"] + timedelta(hours=CACHE_INVALIDATION_TIME_H) > datetime.now(TIMEZONE):
             print("Using cached topics data")
             return user_data["cache"], settings
 
@@ -320,14 +325,14 @@ def get_all_topics_and_courses(username: str, password: str, ignore_cache: bool 
     topics = recodex_topics + owl_topics
     courses = recodex_courses + owl_courses
 
-    topics.sort(key=lambda x: x['deadline'] or datetime(1970,1,1,1))
+    topics.sort(key=lambda x: x['deadline'] or datetime(1970,1,1,1,tzinfo=TIMEZONE))
     courses.sort(key=lambda x: x['name'])
 
     data = {
         "topics": topics,
         "courses": courses,
         "name": name,
-        "timestamp": datetime.now(),
+        "timestamp": datetime.now(TIMEZONE),
         "hidden_courses": hidden_courses
     }
     

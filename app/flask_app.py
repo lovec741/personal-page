@@ -7,9 +7,12 @@ import base64
 import hashlib
 from dotenv import load_dotenv
 import os
+from zoneinfo import ZoneInfo
 
 from app.storage import UserStorage
 from app import assignments
+
+TIMEZONE = ZoneInfo("Europe/Prague")
 
 load_dotenv()
 
@@ -32,7 +35,7 @@ def assignments_login():
 def assignments_overview():
     if request.method == "GET":
         if "data" in session or "settings" in session:
-            now = datetime.now()
+            now = datetime.now(TIMEZONE)
             data = session.pop("data")
             settings = session.pop("settings")
             topics = data["topics"]

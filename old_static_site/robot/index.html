@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Canvas testing</title>
+	<style type="text/css">
+		body {
+			font-family: arial;
+			font-size: 0.5em;
+			color: white;
+			background: black;
+			overflow: hidden;
+		}
+		canvas {
+			width: 1000px;
+			height: 450px;
+			margin-top: 0.5vh; 
+			border: 3px solid gray;
+		}
+		body > div{
+			visibility: collapse;
+			display: none;
+			box-shadow: none;
+		}
+		div#not {
+			visibility: visible;
+			display: block;
+		}
+	</style>
+</head>
+<body>
+<div id="not">
+	<canvas></canvas>
+	<input type="checkbox" id="lift"></input>
+	<p id="res"></p>
+	<script src="paint.js"></script>
+</div>
+</body>
+</html>

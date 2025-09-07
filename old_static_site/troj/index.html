@@ -1,0 +1,64 @@
+<html>
+<head>
+<style>
+	body {
+		overflow: hidden;
+		font-family: helvetica;
+		zoom: 350%;
+	}
+	body > div{
+		visibility: collapse;
+		display: none;
+		box-shadow: none;
+	}
+	div#not {
+		visibility: visible;
+		display: block;
+	}
+</style>
+</head>
+<body>
+<b><input id="x1" type="text"></input> . . . <input id="x2" type="text"></input><br>
+<input id="x3" type="text"></input> . . . <input id="x4" type="text"></input><br>
+<span id="vypoc"></span>
+Přímá úměrnost <input id="umn" type="checkbox" checked></input><br>
+<button onclick="check()">Calc</button></b>
+<button onclick="x1.value=''; x2.value=''; x3.value=''; x4.value=''; vypoc.innerHTML=''">Clear</button>
+<script>
+var x1 = document.getElementById("x1")
+var x2 = document.getElementById("x2")
+var x3 = document.getElementById("x3")
+var x4 = document.getElementById("x4")
+var umn = document.getElementById("umn")
+var vypoc = document.getElementById("vypoc")
+function check() {
+	let poc1 = null
+	let poc2 = null
+	let poc3 = null
+	let poc4 = null
+	if (x1.value != "" && x2.value != "" && x3.value != "" && x4.value == "") {
+		poc1 = x4
+		poc2 = x3
+		poc3 = x1
+		poc4 = x2
+	}
+	else if (x1.value != "" && x2.value != "" && x3.value == "" && x4.value != "") {
+		poc1 = x3
+		poc2 = x4
+		poc3 = x2
+		poc4 = x1
+	}
+	if (poc1 != null) {
+		if (umn.checked) {
+			poc1.value = parseFloat(poc2.value)/parseFloat(poc3.value)*parseFloat(poc4.value)
+			vypoc.innerHTML = "Výpočet: "+poc2.value+" / "+poc3.value+" * "+poc4.value+"<br>"
+		}
+		else {
+			poc1.value = parseFloat(poc3.value)/parseFloat(poc2.value)*parseFloat(poc4.value)	
+			vypoc.innerHTML = "Výpočet: "+poc3.value+" / "+poc2.value+" * "+poc4.value+"<br>"
+		} 
+	}
+}
+</script>
+</body>
+</html>

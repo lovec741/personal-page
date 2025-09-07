@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Login and Register</title>
+	<style type="text/css">
+		body {
+			color: rgb(230, 230, 230);
+			background: black;
+			margin: 0;
+			font-family: arial;
+		}
+		button {
+			cursor: pointer;
+		}
+		::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+		  color: rgb(200, 200, 200);
+		  opacity: 1; /* Firefox */
+		}
+
+		:-ms-input-placeholder { /* Internet Explorer 10-11 */
+		  color: rgb(200, 200, 200);
+		}
+
+		::-ms-input-placeholder { /* Microsoft Edge */
+		  color: rgb(170, 170, 170);
+		}
+		button, input {
+			outline: none;
+		}
+		#switch:hover {
+			background: rgb(90, 90, 90);
+			color: rgb(220, 220, 220);
+		}
+		#switch:active {
+			background: rgb(70, 70, 70);
+			color: rgb(200, 200, 200);
+		}
+		#loginbutton:hover, #registerbutton:hover {
+			background: rgb(70, 70, 70);
+			color: rgb(220, 220, 220);
+		}
+		#loginbutton:active, #registerbutton:active {
+			background: rgb(50, 50, 50);
+			color: rgb(200, 200, 200);
+		}
+		#switch {
+			z-index: 101;
+			position: fixed;
+			right: 2%;
+			top: 2%;
+			width: 30%;
+			height: 5%;
+			font-size: 1.5vw;
+			color: rgb(230, 230, 230);
+			background: rgb(100, 100, 100);
+			border: none;
+			border-radius: 5px;
+		}
+		#login {
+			position: fixed;
+			width: 80%;
+			height: 80%;
+			top: 13%;
+			left: 10%;
+			background: rgb(100, 100, 100);
+			border-radius: 15px;
+			visibility: visible;
+		}
+		#register {
+			position: fixed;
+			width: 80%;
+			height: 80%;
+			top: 13%;
+			left: 10%;
+			background: rgb(100, 100, 100);
+			border-radius: 15px;
+			visibility: hidden;
+		}
+		#loginproblem {
+			text-align: center;
+			left: 25%;
+			position: fixed;
+			width: 50%;
+			height: 8%;
+			top: 65%;
+			font-size: 1.5em;
+		}
+		#regproblem {
+			text-align: center;
+			left: 25%;
+			position: fixed;
+			width: 50%;
+			height: 8%;
+			top: 70%;
+			font-size: 1.5em;
+			
+		}
+		#loginbutton, #registerbutton{
+			color: rgb(230, 230, 230);
+			background: rgb(80, 80, 80);
+			left: 40%;
+			position: fixed;
+			bottom: 13%;
+			width: 20%;
+			height: 5%;
+			font-size: 2em;
+			border: 0 none;
+			border-radius: 3px;
+		}
+		input[type="text"], input[type="password"]{
+			color: rgb(230, 230, 230);
+			background: rgb(80, 80, 80);
+			left: 30%;
+			position: fixed;
+			padding: 0 1vw;
+			width: 40%;
+			height: 8%;
+			font-size: 2em;
+			border: 0 none;
+			border-radius: 3px;
+		}
+		#loginusername {
+			top: 30%;
+		}
+		#loginpassword {
+			top: 45%;
+		}
+		#regname {
+			top: 20%;
+		}
+		#regsurname {
+			top: 30%;
+		}
+		#regusername {
+			top: 40%;
+		}
+		#regpassword {
+			top: 50%;
+		}
+		#regpassword2 {
+			top: 60%;
+		}
+		#cover {
+			background: black;
+			z-index: 100;
+			width: 100%;
+			position: fixed;
+			height: 13vh;
+		}
+	</style>
+</head>
+<body>
+	<div id="cover"></div>
+	<button id="switch">Don't have an account yet?</button>
+	<div id="login">
+		<input type="text" id="loginusername" placeholder="Username" autocomplete="off">
+		<input type="password" id="loginpassword" placeholder="Password" autocomplete="off">
+		<p id="loginproblem"></p>
+		<button id="loginbutton">Login</button>
+	</div>
+	<div id="register">
+		<input type="text" id="regname" placeholder="Name" autocomplete="off">
+		<input type="text" id="regsurname" placeholder="Surname" autocomplete="off">
+		<input type="text" id="regusername" placeholder="Username" autocomplete="off">
+		<input type="password" id="regpassword" placeholder="Password" autocomplete="off">
+		<input type="password" id="regpassword2" placeholder="Confirm Password"autocomplete="off">
+		<p id="regproblem"></p>
+		<button id="registerbutton">Register</button>
+	</div>
+	<script src="logandreg.js"></script>
+</body>
+</html>

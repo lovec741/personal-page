@@ -1,0 +1,302 @@
+<html>
+<head>
+<title>Jdeme na ryby!</title>
+<style>
+@font-face {
+	font-family: DandFall;
+	src: url("Dandelion Fall.ttf");
+}
+body {
+	-webkit-user-select: none; /* Safari */
+	-ms-user-select: none; /* IE 10+ and Edge */
+	user-select: none; /* Standard syntax */
+	font-family: DandFall;
+	background: gray;
+	margin: 0;
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+	overflow: hidden;
+}
+body::-webkit-scrollbar {
+  display: none;
+}
+.prices {
+	position: relative;
+	text-align: center;
+	bottom: 60px;
+	font-weight: 900;
+	font-size: 1.5em;
+}
+.main_tile_img {
+	border-radius: 10px;
+	box-shadow: 0px 0px 5px 0px black;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	-webkit-user-drag: none;
+	user-drag: none;
+	-webkit-touch-callout: none;
+}
+.main_tile {
+	transition: transform 0.5s linear;
+}
+.gray {
+	filter: sepia(100%) hue-rotate(171deg) contrast(1) saturate(3) brightness(0.7);
+	box-shadow: 0px 0px 2px 0px white;
+}
+div {
+	position: absolute;
+}
+#choose {
+	width: 100%;
+	height: 100%;
+	background: gray;
+	z-index: 3;
+}
+#cont {
+	margin: auto;
+	position: static;
+	width: 40%;
+	height: 30%;
+	margin-top: 1%;
+	
+}
+#start {
+	visibility: hidden;
+	margin-left: 30%;
+	width: 40%;
+}
+#next {
+	visibility: hidden;
+	margin-top: 7vh; 
+	margin-left: 90vw; 
+	padding: 0% 3%;
+	position: absolute;
+}
+#end {
+	visibility: hidden;
+	margin-top: 7vh; 
+	margin-left: 84vw; 
+	padding: 0% 3%;
+	position: absolute;
+}
+.bold {
+	font-size: 3em;
+	font-weight: 900;
+}
+span {
+	font-size: 2em;
+}
+#name {
+	text-align: center;
+	font-size: 4em;
+	margin: 0;
+}
+#amount {
+	text-align: center;
+	font-size: 3em;
+	margin: 0;
+}
+button {
+	border-radius: 30px;
+	outline: none;
+	font-family: DandFall;
+	background: rgb(200,200,200);
+	font-size: 2em;
+}
+button:hover {
+	background: rgb(190,190,190);
+}
+button:active {
+	background: rgb(150,150,150);
+}
+#playing {
+	letter-spacing: 7px;
+	color: green;	
+	text-shadow: 2px 0 0 #000, -2px 0 0 #000, 0 2px 0 #000, 0 -2px 0 #000, 1px 1px #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+	font-weight: 900;
+}
+
+#ui {
+	position: fixed;
+	width: 100%;
+	height: 15vh;
+	z-index: 2;
+	background: gray;
+	box-shadow: 0px 0px 5px 0px rgb(30,30,30);
+	border-radius: 0 0 20px 20px;
+}
+#ui_fish_coins {
+	width: 100%;
+	height: 15%;
+	z-index: 2;
+}
+#money_give_menu {
+	visibility: hidden;
+	position: fixed;
+	width: 60%;
+	height: 80%;
+	margin: 5% 20%;
+	background: gray;
+	z-index: 4;
+	box-shadow: 0px 0px 5px 0px rgb(30,30,30);
+	border-radius: 20px;
+}
+#menu_text {
+	margin: 0.5em 1em 0 1em;
+}
+.coin {
+	width: 40px;
+    font-size: 1.8em;
+    height: 40px;
+    text-align: center;
+    color: rgb(179,190,3);
+    border: 3.5px solid rgb(179,190,3);
+    border-radius: 5000px;
+    background: rgb(19,82,32);
+	display: inline-block;
+	margin-right: 0.1em;
+}
+.container {
+	margin: 3%;
+	width: 100%;
+	height: 50px;
+}
+#continue{
+	position: absolute; 
+	bottom: 2%; 
+	right: 2%; 
+	padding-right: 0.5em
+}
+#popup {
+	visibility: hidden;
+	position: fixed;
+	width: 60%;
+	height: 80%;
+	margin: 5% 20%;
+	background: gray;
+	z-index: 4;
+	box-shadow: 0px 0px 5px 0px rgb(30,30,30);
+	border-radius: 20px;
+}
+#popup_text {
+	margin: 1em;
+	font-size: 3em;
+}
+#popup_button1, #popup_button2{
+	position: absolute; 
+	bottom: 2%; 
+	padding-right: 0.5em;
+	font-size: 3em;
+}
+#popup_button1 {
+	left: 2%; 
+}
+#popup_button2 {
+	right: 2%; 
+}
+.player_name_input {
+	width: 80%;
+	margin: 1% 10% 3% 10%;
+	border-radius: 20px;
+	font-family: DandFall;
+	font-size: 2em;
+	text-align: center;
+	outline: none;
+}
+#remove_player_name {
+	visibility: visible;
+	background: rgb(225,0,0);
+	color: white;
+	float: right;
+}
+#add_player_name {
+	float: left;
+	background: rgb(50,150,0);
+	color: white;
+}
+#add_player_name:hover {
+	background: rgb(30,125,0);
+}
+#add_player_name:active {
+	background: rgb(10,100,0);
+}
+#remove_player_name:hover {
+	background: rgb(175,0,0);
+}
+#remove_player_name:active {
+	background: rgb(125,0,0);
+}
+#worm:hover {
+	filter: brightness(0.9)
+}
+#worm:active {
+	filter: brightness(0.5)
+}
+#click_block {
+    width: 100vw;
+    height: 100vh;
+    z-index: 3;
+    display: none;
+}
+body > div{
+	visibility: collapse;
+	display: none;
+	box-shadow: none;
+}
+div#not {
+	visibility: visible;
+	display: block;
+}
+</style>
+<link rel="stylesheet" href="scripts/style.css">
+</head>
+<body onresize="resize_tiles()">
+<div id="not">
+<div id="choose">
+	<div id="cont">
+		<p id="name">Jdeme na ryby!</p>
+		<!--<p id="amount">Počet hráčů:</p>
+		<span class="bold">4 </span><input type="range" min=4 max=6></input><span class="bold"> 6</span>
+		<br>-->
+		<div id="player_name_input_container" style="position: static">
+		<input class="player_name_input" type="text" oninput="player_name_onchange()" maxlength=10>
+		<input class="player_name_input" type="text" oninput="player_name_onchange()" maxlength=10>
+		<input class="player_name_input" type="text" oninput="player_name_onchange()" maxlength=10>
+		<input class="player_name_input" type="text" oninput="player_name_onchange()" maxlength=10>
+		</div>
+		<button id="add_player_name" onclick="add_player_name()">Přidat hráče</button>
+		<button id="remove_player_name" onclick="remove_player_name()">Odebrat hráče</button>
+		<button id="start" onclick="start_click()">Spustit hru!</button>
+	</div>
+</div>
+<div id="ui">
+	<span style="margin-top: 0.6vh; margin-left: 10%; position: absolute;">Hraje: </span>
+	<span style="margin-top: 0.6vh; margin-left: 14%; position: absolute" id="playing">GREEN</span>
+	<span id="info" style="margin-top: 0.6vh; width: 100%; text-align: center; position: absolute;">Pick your starting tile!</span>
+	<span id="turn-counter" style="margin-top: 1vh; margin-left: 85%; position: absolute;">Kolo: 1</span>
+	<span id="fish-counter" style="margin-top: 7vh; margin-left: 70%; position: absolute;">Nesebraných ryb: 7</span>
+	<div id="ui_fish_coins">
+	</div>
+	<button id="next" onclick="next_player()">Další</button>
+	<button id="end" onclick="next_player(true)">Ukončit mou hru</button>
+</div>
+<div id="click_block">
+</div>
+<div id="money_give_menu">
+</div>
+<div id="popup">	
+<p id="popup_text"></p>
+<button id="popup_button1"></button>
+<button id="popup_button2"></button>
+</div>
+</div>
+<script src="scripts/player.js"></script>
+<script src="scripts/start_menu.js"></script>
+<script src="scripts/main.js"></script>
+<script src="scripts/draggable_menu.js"></script>
+<script src="scripts/where_move.js"></script>
+<script src="scripts/DragDropTouch.js"></script>
+</body>
+</html>

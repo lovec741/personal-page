@@ -1,0 +1,64 @@
+﻿<html>
+<head>
+<style>
+	body {
+		overflow: hidden;
+		font-family: helvetica;
+		zoom: 200%;
+	}
+	body > div{
+		visibility: collapse;
+		display: none;
+		box-shadow: none;
+	}
+	div#not {
+		visibility: visible;
+		display: block;
+	}
+</style>
+</head>
+<b><input id="a" type="text" placeholder=0></input>
+x^2 + <input id="b" type="text" placeholder=0></input>
+x + <input id="c" type="text" placeholder=0></input> = 0<br>
+<button onclick="calc()">Calc</button></b><br>
+<span id="res"></span>
+<script>
+var a_el = document.getElementById("a")
+var b_el = document.getElementById("b")
+var c_el = document.getElementById("c")
+var res = document.getElementById("res")
+
+function calc() {
+	a = eval(a_el.value.replace(",", "."))
+	if (a_el.value == "") {a = 0}
+	b = eval(b_el.value.replace(",", "."))
+	if (b_el.value == "") {b = 0}
+	c = eval(c_el.value.replace(",", "."))
+	if (c_el.value == "") {c = 0}
+	D = b**2-4*a*c
+	text = "D = "+b+"^2 - 4×"+a+"×"+c+" = "+(b**2)+" - "+(4*a*c)+" = "+D+"<br>"
+	if (D > 0) {
+		x1 = (-b+Math.sqrt(D))/(2*a)
+		x2 = (-b-Math.sqrt(D))/(2*a)
+		text += "x1, x2 = ("+(-b)+"±√"+D+")÷(2×"+a+")<br>x1 = "+x1+"<br>x2 = "+x2+"<br>K = {"+x1+", "+x2+"}"
+		if (x1 < 0 ) {x1 = " + "+(-x1)}
+		else if (x1 == 0 ) {x1 = ""}
+		else {x1 = " - "+x1}
+		if (x2 < 0 ) {x2 = " + "+(-x2)}
+		else if (x2 == 0 ) {x2 = ""}
+		else {x2 = " - "+x2}
+		text += "<br><b>ROZKLAD: "+a+"(x"+x1+")(x"+x2+") = 0</b>"
+	}
+	else if (D == 0) {
+		x = (-b)/(2*a)
+		text += "x = (-"+b+")÷(2×"+a+") = "+x+"<br>K = {"+x+"}"
+	}
+	else {
+		text += "K = Ø" 
+	}
+	text = text.replace(/\./g,",")
+	res.innerHTML = text
+}
+</script>
+</body>
+</html>

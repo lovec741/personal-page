@@ -1,0 +1,193 @@
+<html>
+<head> 
+<style>
+	body {
+		font-family: arial; 
+		margin: 0; 
+		background: rgb(0,0,0);
+		overflow: hidden;
+	}
+		
+	
+</style>
+</head>
+<body>
+<input list="authors" id="author_name" placeholder="Author" oninput="place_in_history = 0; current = [b_inp.value, a_inp.value, l_inp.value]"/>
+<datalist id="authors">
+</datalist>
+<input list="books" id="book_name" placeholder="Book Name" oninput="place_in_history = 0; current = [b_inp.value, a_inp.value, l_inp.value]"/>
+<datalist id="books">
+</datalist>
+<input list="locations" id="location" placeholder="Location" oninput="place_in_history = 0; current = [b_inp.value, a_inp.value, l_inp.value]"/>
+<datalist id="locations">
+</datalist>
+
+<button id="send" onclick="send_book_data(b_inp.value, a_inp.value, l_inp.value); add_to_datalist([b_inp.value, a_inp.value, l_inp.value]); b_inp.value = '';">SAVE</button> 
+<script>
+var books = []
+var authors = []
+var locs = []
+const b_inp = document.getElementById('book_name')
+const a_inp = document.getElementById('author_name')
+const l_inp = document.getElementById('location')
+const book_data = document.getElementById("books")
+const author_data = document.getElementById("authors")
+const locations = document.getElementById("locations")
+var place_in_history = 0
+let history = []
+let current = []
+var in_dropdown = [[], [], []]
+function add_to_datalist(stuff, multiple=false) {
+	if (multiple) {
+		for (let i = 0; i < stuff[0].length; i++) {
+			if (in_dropdown[0].indexOf(stuff[0][i]) < 0) {
+				book_data.innerHTML = '<option value="'+stuff[0][i]+'">' + book_data.innerHTML
+				in_dropdown[0].push(stuff[0][i])
+			}
+			if (in_dropdown[1].indexOf(stuff[1][i]) < 0) {
+				author_data.innerHTML = '<option value="'+stuff[1][i]+'">' + author_data.innerHTML
+				in_dropdown[1].push(stuff[1][i])
+			}
+			if (in_dropdown[2].indexOf(stuff[2][i]) < 0) {
+				locations.innerHTML = '<option value="'+stuff[2][i]+'">' + locations.innerHTML
+				in_dropdown[2].push(stuff[2][i])
+			}
+		}
+	}
+	else {
+		if (in_dropdown[0].indexOf(stuff[0]) < 0) {
+			book_data.innerHTML = '<option value="'+stuff[0]+'">' + book_data.innerHTML
+			in_dropdown[0].push(stuff[0])
+		}
+		if (in_dropdown[1].indexOf(stuff[1]) < 0) {
+			author_data.innerHTML = '<option value="'+stuff[1]+'">' + author_data.innerHTML
+			in_dropdown[1].push(stuff[1])
+		}
+		if (in_dropdown[2].indexOf(stuff[2]) < 0) {
+			locations.innerHTML = '<option value="'+stuff[2]+'">' + locations.innerHTML
+			in_dropdown[2].push(stuff[2])
+		}
+		history.push(stuff)
+	}
+}
+
+const sendHttpRequest = (method, url, data, type='json') => {
+  const promise = new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open(method, url);
+
+    xhr.responseType = type;
+	
+    if (data) {
+		xhr.setRequestHeader('Content-Type', 'application/json');
+    }
+
+    xhr.onload = () => {
+		if (xhr.status >= 400) {
+			reject(xhr.response);
+		} else {
+			resolve(xhr.response);
+		}
+    };
+
+    xhr.onerror = () => {
+		reject('Something went wrong!');
+    };
+
+    xhr.send(JSON.stringify(data));
+  });
+  return promise;
+};
+function get_book_info() {
+	var failed = 0;
+	const send = () => {
+		sendHttpRequest('POST', 'http://lovec741.pythonanywhere.com/get_book')
+			.then(responseData => {
+				if (responseData["done"] != false) {
+					console.log(responseData)
+					books = books.concat(responseData["books"])
+					authors = authors.concat(responseData["authors"])
+					locs = locs.concat(responseData["places"])
+					add_to_datalist([books, authors, locs], multiple=true)
+				}
+				else {
+					console.log("FAILED")
+				}
+			})
+			.catch(err => {
+				failed += 1
+				if (failed != 10) {
+					send()
+				}
+				else {
+					console.log("CAN'T REACH SERVER")
+				}
+				console.log(err);
+			});
+	}
+	send()
+};
+get_book_info()
+function send_book_data(book, author, loc) {
+	var failed = 0;
+	const send = () => {
+		sendHttpRequest('POST', 'http://lovec741.pythonanywhere.com/send_book', {
+		book: book,
+		author: author,
+		place: loc
+		})
+			.then(responseData => {
+				if (responseData["done"] != false) {
+					
+				}
+				else {
+					console.log("FAILED")
+				}
+			})
+			.catch(err => {
+				failed += 1
+				if (failed != 10) {
+					send()
+				}
+				else {
+					console.log("CAN'T REACH SERVER")
+				}
+				console.log(err);
+			});
+	}
+	send()
+};
+document.addEventListener("keydown", (event) => {
+	/*if (event.key == "ArrowUp") {
+		if (place_in_history >= 1) {
+		place_in_history--
+		if (place_in_history == 0) {
+			b_inp.value = current[0]
+			a_inp.value = current[1]
+			l_inp.value = current[2]
+		}
+		else {
+			b_inp.value = history[history.length-place_in_history][0]
+			a_inp.value = history[history.length-place_in_history][1]
+			l_inp.value = history[history.length-place_in_history][2]
+		}
+		}
+	}
+	else if (event.key == "ArrowDown") {
+		if (place_in_history < history.length) {
+		place_in_history++
+		b_inp.value = history[history.length-place_in_history][0]
+		a_inp.value = history[history.length-place_in_history][1]
+		l_inp.value = history[history.length-place_in_history][2]
+		}
+	}*/
+	if (event.key == "Enter") {
+		send_book_data(b_inp.value, a_inp.value, l_inp.value)
+		add_to_datalist([b_inp.value, a_inp.value, l_inp.value])
+		b_inp.value = ''
+		//a_inp.value = ''
+	}
+})
+</script>
+</body>
+</html>

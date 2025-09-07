@@ -1,0 +1,66 @@
+<html>
+<head> 
+<style>
+	body {font-family: arial; margin: 20px; background: rgb(240,240,240)}
+	body > div{
+		visibility: collapse;
+		display: none;
+		box-shadow: none;
+	}
+	div#not {
+		visibility: visible;
+		display: block;
+	}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+canvas = document.getElementById("c")
+c = canvas.getContext("2d")
+canvas.width = 700
+canvas.height = 400
+//lines = [[], [], [], []]
+lines = [
+[0, ";", "+", "ě", "š", "č", "ř", "ž", "ý", "á", "í", "é", "="],
+[1.5, "q", "w", "e", "r", "t", "z", "u", "i", "o", "p", "ú", ")"],
+[1.8, "a", "s", "d", "f", "g", "h", "j", "k", "l", "ů", "§"],
+[2.2, "y", "x", "c", "v", "b", "n", "m", ",", ".", "-"]
+]
+tile_width = 50
+
+time = () => {
+	return new Date().getTime()
+}
+draw_line = (startx, starty, endx, endy) => {
+	c.beginPath()
+	c.moveTo(startx, starty)
+	c.lineTo(endx, endy)
+	c.stroke()
+}
+var last = []
+var last_time = 0
+var timeout = 500
+document.addEventListener('keydown', (e) => {
+console.log(e.key)
+if (e.key != "Delete") {
+if (time()-last_time > timeout) {
+	c.clearRect(0, 0, canvas.width, canvas.height)
+	last = []
+}
+for (var i = 0; i < lines.length; i++) {
+	if (lines[i].includes(e.key.toLowerCase())) {
+		if (last != []) {
+			draw_line(last[0], last[1], (lines[i][0]+lines[i].indexOf(e.key.toLowerCase()))*tile_width, (i+1)*tile_width)
+		}
+		last = [(lines[i][0]+lines[i].indexOf(e.key.toLowerCase()))*tile_width, (i+1)*tile_width]
+		last_time = time()
+	}	
+}} else {
+	//c.clearRect(0, 0, canvas.width, canvas.height)
+	last = []
+}
+})
+</script>
+</body>
+</html>

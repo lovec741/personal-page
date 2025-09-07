@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Canvas testing</title>
+	<style type="text/css">
+		canvas {
+			outline: 1px solid white;
+			width: 80vh;
+			height: 80vh;
+			margin-left: calc(50vw - 40vh);
+			margin-right: calc(50vw - 40vh);
+		}
+		body {
+			margin: 0px;
+			background: black;
+			font-family: arial;
+			width: 98vw;
+		}
+		body > div{
+			visibility: collapse;
+			display: none;
+			box-shadow: none;
+		}
+		div#not {
+			visibility: visible;
+			display: block;
+		}
+	</style>
+</head>
+<body>
+<div id="not">
+	<div id="controls"></div>
+	<div id=""></div>
+	<p id="score" style="font-size: 3em; text-align: center; margin-bottom: 0.3em; margin-top: 0.3em"></p></br>
+	<canvas></canvas>
+	<script src="canvas.js"></script>
+</div>
+</body>
+</html>

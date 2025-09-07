@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" name="viewport" content="width=1000; user-scalable=0;" />
+<style>
+h1 { 
+  font-size: 42px
+}
+#obdelnik{
+  margin: 0;
+  padding-top:15px;
+  padding-left:12px;
+  padding-bottom:8px;
+  background-color:#4682b4;
+}
+
+h2 {
+  font-size: 35px
+}
+
+#obdelnik2{
+  margin: -13px 0px;
+  padding-top:0px;
+  padding-left:12px;
+  padding-bottom:8px;
+  background-color:#4682b4;
+}
+
+body > div{
+    visibility: collapse;
+    display: none;
+    box-shadow: none;
+}
+div#not {
+    visibility: visible;
+    display: block;
+}
+* {
+  box-sizing:border-box
+}
+body {
+  font-family: Verdana,sans-serif;
+  margin:0;
+  overflow-x: hidden;
+}
+
+/* Slideshow container */
+.slideshow-container {
+  width: 100vw;
+  position: relative;
+  margin: 0;
+  padding-top:30px;
+}
+.mySlides {
+  position: absolute;
+  top: 2em;
+  width: 100vw;
+}
+
+/* Next & previous buttons */
+.prev, .next {
+  cursor: pointer;
+  position: absolute;
+  top: 0;
+  top: 50%;
+  width: auto;
+  padding: 16px;
+  margin-top: -22px;
+  color: white;
+  font-weight: bold;
+  font-size: 18px;
+  transition: 0.6s ease;
+  border-radius: 0 3px 3px 0;
+}
+
+/* Position the "next button" to the right */
+.next {
+  right: 0;
+  border-radius: 3px 0 0 3px;
+}
+.prev {
+  left: 0;
+  border-radius: 3px 0 0 3px;
+}
+/* On hover, add a black background color with a little bit see-through */
+.prev:hover, .next:hover {
+  background-color: rgba(0,0,0,0.8);
+}
+
+/* Caption text */
+.text {
+  text-shadow: 0 0 10px #000;
+  color: #f2f2f2;
+  font-size: 30px;
+  padding: 8px 12px;
+  position: relative;
+  top: -33vw;
+  width: 100%;
+  text-align: center;
+}
+
+/* The dots/bullets/indicators */
+.dot {
+  cursor:pointer;
+  height: 18px;
+  width: 18px;
+  margin: 0 2px;
+  background-color: #bbb;
+  border-radius: 50%;
+  display: inline-block;
+  transition: background-color 0.6s ease;
+}
+
+.active, .dot:hover {
+  background-color: #717171;
+}
+
+/* Fading animation */
+.fromleft {
+  /*-webkit-animation-name: fade;
+  -webkit-animation-duration: 1.5s;*/
+  animation-name: fromleft;
+  animation-duration: 1.5s;
+}
+.fromright {
+  animation-name: fromright;
+  animation-duration: 1.5s;
+}
+.toleft {
+  animation-name: toleft;
+  animation-duration: 1.5s;
+}
+.toright {
+  animation-name: toright;
+  animation-duration: 1.5s;
+}
+/*@-webkit-keyframes fade {
+  from {opacity: .4} 
+  to {opacity: 1}
+}*/
+@keyframes fromleft {
+  from {transform: translateX(100vw)} 
+  to {transform: translateX(0)}
+}
+@keyframes fromright {
+  from {transform: translateX(-100vw)} 
+  to {transform: translateX(0)}
+}
+@keyframes toleft {
+  from {transform: translateX(0)} 
+  to {transform: translateX(100vw)}
+}
+@keyframes toright {
+  from {transform: translateX(0)} 
+  to {transform: translateX(-100vw)}
+}
+/* On smaller screens, decrease text size */
+@media only screen and (max-width: 300px) {
+  .slprev, .slnext,.text {font-size: 11px}
+}
+</style>
+<title>Jirkova strĂˇnka ĂşplnÄ› ovĹˇem</title>
+</head>
+<body bgcolor="#778899">
+  <div id="not">
+    <span style="font-family: Gill Sans, sans-serif"><span style="color: white;"><h1 id="obdelnik"> Jirkova strĂˇnka ĂşplnÄ› ovĹˇem</h1></span></span>
+    <span style="font-family: Gill Sans, sans-serif"><span style="color: white;"><h2 id="obdelnik2"> a taky o niÄŤem</h2></span></span>
+    <div id="obdelnik3">
+      <div class="slideshow-container">
+        <img src="img_nature_wide.jpg" style="width:100%; visibility: hidden">
+        <div class="mySlides fromright" style="display: block">
+          <img src="img_nature_wide.jpg" style="width:100%">
+          <div class="text"><span style="font-family: Gill Sans, sans-serif"><span style="color: white;">sympatickĂˇ krajina</span></span></div>
+        </div>
+
+        <div class="mySlides fromright" style="display: none">
+          <img src="img_fjords_wide.jpg" style="width:100%">
+          <div class="text">sympatickĂˇ panĂ­ dÄ›lĂˇ nÄ›co na nebezpeÄŤnĂ©m tentononc</div>
+        </div>
+
+        <div class="mySlides fromright" style="display: none">
+          <img src="img_mountains_wide.jpg" style="width:100%">
+          <div class="text">idk</div>
+        </div>
+
+        <a class="prev" onclick="prevSlide()"><</a>
+        <a class="next" onclick="nextSlide()">></a>
+
+        </div>
+        <br>
+
+        <div style="text-align:center;position: relative;top: -60px;">
+          <span class="dot" onclick="showSlides(slideIndex=1)"></span> 
+          <span class="dot" onclick="showSlides(slideIndex=2)"></span> 
+          <span class="dot" onclick="showSlides(slideIndex=3)"></span> 
+        </div>
+      </div>
+    </div>
+
+
+    <script>
+    var slideIndex = 1
+    var timeout = null
+    showSlides(slideIndex);
+
+    function nextSlide() {
+      showSlides(slideIndex++, true);
+    }
+    function prevSlide() {
+      showSlides(slideIndex--);
+    }
+    function showSlides(n, rev=false) {
+      var i;
+      var slides = document.getElementsByClassName("mySlides");
+      var dots = document.getElementsByClassName("dot");
+      if (n > slides.length || slideIndex > slides.length) {
+        slideIndex = 1
+      }
+      if (n < 1 || slideIndex < 1) {
+        slideIndex = slides.length
+      }
+      for (i = 0; i < slides.length; i++) {
+        if (slides[i].style.display != "none" && i != slideIndex-1) {
+          if (!rev)
+            slides[i].className = "mySlides toleft"
+          else 
+            slides[i].className = "mySlides toright"
+          slides[i].addEventListener('animationend', (e) => {
+            e.target.style.display = "none"
+          },
+            { once: true }
+          )
+        }
+        else {
+          slides[i].style.display = "none"
+        }
+      }
+      for (i = 0; i < dots.length; i++) {
+          dots[i].className = dots[i].className.replace(" active", "");
+      }
+      if (!rev)
+        slides[slideIndex-1].className = "mySlides fromright"
+      else 
+        slides[slideIndex-1].className = "mySlides fromleft"
+      slides[slideIndex-1].style.display = "block";
+      dots[slideIndex-1].className += " active";
+      if (timeout != null) {
+        clearTimeout(timeout)
+      }
+      timeout = setTimeout(nextSlide, 3000); // Change image every 12 seconds
+    }
+    </script>
+  </div>
+</body>
+</html>

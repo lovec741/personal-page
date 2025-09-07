@@ -1,0 +1,84 @@
+﻿<html>
+<head>
+<style>
+.stop-select{
+   user-select: none; 
+   -webkit-user-select: none;
+   -moz-user-select: none;
+   -ms-user-select: none;
+}
+body > div{
+	visibility: collapse;
+	display: none;
+	box-shadow: none;
+}
+div#not {
+	visibility: visible;
+	display: block;
+}
+</style>
+</head>
+<body>
+<div id="not">
+<p id="1" style="font-size: 5em; width: 100%; height: 10%; font-family: arial" class="stop-select"></p>
+<input type="text" id="2" style="font-size: 5em; width: 100%; height: 20%;" oninput="check()"/>
+<span id="cor" style="font-size: 5em; font-family: arial; float: left">0</span>
+<span id="mis" style="font-size: 5em; font-family: arial; float: right">0.00%</span>
+<p id="tm" style="font-size: 5em; font-family: arial; text-align: center">0</p>
+</div>
+<script>
+//var al = ["a", "á", "b", "c", "č", "d", "e", "é", "ě", "f", "g", "h", "ch", "i", "í", "j", "k", "l", "m", "n", "o", "ó", "p", "q", "r", "ř", "s", "š", "t", "u", "ú", "ů", "v", "w", "x", "y", "ý", "z", "ž"]
+var al = ["a", "b", "c", "d", "e", "f", "g", "h", "ch", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
+//"ď", "ť", "ň", 
+var last = 0
+var mistakes = 0
+var correct = 1
+var made_mistake = false
+
+var start = 0
+var end = 0
+
+var times = []
+var avg_time = 0
+const p = document.getElementById("1")
+const inp = document.getElementById("2")
+const cor = document.getElementById("cor")
+const mis = document.getElementById("mis")
+const tm = document.getElementById("tm")
+function get_word() {
+	start = 0
+	var ret_text = ""
+	var big = 0
+	for (var i = 0; i < 5; i++) {
+		big = 1//Math.floor(Math.random() * 5)
+		var letter = al[Math.floor(Math.random() * al.length)]
+		if (!big && letter != "i") {
+			ret_text += letter.toUpperCase()
+		} else {
+			ret_text += letter
+		}
+	}
+	p.innerHTML = ret_text
+	
+}
+get_word()
+function check() {
+	if (start == 0) {start = new Date().getTime(); made_mistake = false}
+	if (inp.value.length < last && !made_mistake) {
+		mistakes +=1
+		mis.innerHTML = (mistakes/correct*100).toFixed(2)+"%"
+		made_mistake = true
+	}
+	last = inp.value.length
+	if (inp.value == p.innerHTML) {
+		end = new Date().getTime()
+		times.push(end - start)
+		sum = times.reduce((a, b) => a + b, 0);
+		avg_time = (sum / times.length) || 0;
+		mis.innerHTML = (mistakes/correct*100).toFixed(2)+"%"
+		setTimeout(() => {tm.innerHTML = parseFloat((avg_time/1000).toFixed(1).toString())+"s";inp.value = ""; get_word(); last = 0; correct += 1; cor.innerHTML = correct-1}, 100)
+	}
+}
+</script>
+</body>
+</html>

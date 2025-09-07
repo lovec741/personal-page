@@ -1,0 +1,461 @@
+<html>
+<head>
+<style>
+	body {
+		background: rgb(100,255,100);
+		overflow: hidden;
+		font-family: helvetica;
+	}
+	p {
+		font-size: 2em;
+		font-weight: 900;
+		margin-bottom: 10px;
+	}
+	body > div{
+		visibility: collapse;
+		display: none;
+		box-shadow: none;
+	}
+	div#not {
+		visibility: visible;
+		display: block;
+	}
+</style>
+</head>
+<body>
+<div id="not">
+<p id="score">SCORE: 0</p>
+<span>NAME </span><input type="text" id="p_name"/><span id="error"></span>
+<button onclick="change_color()">Change color!</button>
+<div id="c">
+<span id="lead" style="float: right;font-size: 2em"></span>
+</div>
+</div>
+<script type="text/javascript" src="rajce.js"></script> 
+<script>
+// hrac muze skrz sebe prochazet kdyz pred tim dal zpet
+
+function get_cookie(name) {
+	var list = document.cookie.split("; ")
+	for (var i = 0; i < list.length; i++) {
+		if (list[i].split("=")[0] == name) {
+			if (list[i].split("=")[1] == undefined) {
+				return ""
+			} 
+			return list[i].split("=")[1]
+		}
+	}
+}
+if (get_cookie("had_name") == undefined) {
+	document.cookie = "had_name=;path='/had/'"
+}
+document.getElementById("p_name").value = get_cookie("had_name")
+
+
+var color_variations = [
+	["#22ff22", "#77ff77", "green", [213,36,26]],
+	["#3399ff", "#5fabfc", "#004c99", [255,194,102]], 
+	["#ff3333", "#ffcccc", "#990000", [255,153,204]],
+	["#ffff00", "#ffffcc", "#a0a004", [204,255,153]],
+	["#ff00ff", "#ffccff", "#660066", [153,255,204]],
+	["#33ff99", "#76fcb7", "#006633", [255,153,153]]
+]
+var c_index = 0
+var wid = 15
+var hei = 12
+var counter = 0
+var color_main = "#11ff11"
+var color_stripes = "green"
+var color_head = "#22ff22"
+var fruit_color = [213,36,26]
+var size = 50
+var xmlns = "http://www.w3.org/2000/svg";
+var duha = false
+var last_ind = 0
+function change_color(snake_only=false) {
+	c_index++
+	if (c_index == color_variations.length) {c_index = 0}
+	color_main = color_variations[c_index][0]
+	color_stripes = color_variations[c_index][2]
+	color_head = color_variations[c_index][0]
+	if (!snake_only) {
+		document.querySelector("body").style.background = color_variations[c_index][1]
+		fruit_color = color_variations[c_index][3]
+	}
+	draw(game.body, game.berry)
+	
+}
+function CreateBoard() {
+    var boxWidth = wid*size;
+    var boxHeight = hei*size;
+
+    var svg = document.createElementNS(xmlns, "svg");
+    svg.setAttributeNS(null, "viewBox", "0 0 " + boxWidth + " " + boxHeight);
+    svg.setAttributeNS(null, "width", boxWidth);
+    svg.setAttributeNS(null, "height", boxHeight);
+	svg.setAttributeNS(null, "id", "svg");
+    svg.style.display = "inline";
+	svg.style.border = "5px solid gray"
+	svg.style.marginTop = "10px"
+	var square = document.createElementNS(xmlns, "rect");
+	square.setAttributeNS(null, "width", wid*50);
+	square.setAttributeNS(null, "height", hei*50);
+	square.setAttributeNS(null, "x", 0);
+	square.setAttributeNS(null, "y", 0);
+	svg.appendChild(square);
+    var cont = document.getElementById("c");
+    cont.insertBefore(svg, cont.firstChild);
+}
+CreateBoard()
+function is_in(what, in_what) {
+	for (var i = 0; i < in_what.length; i++) {
+		if (what[0] == in_what[i][0] && what[1] == in_what[i][1]) {
+			return true
+		}
+	}
+	return false
+}
+function draw(list, berry, red=false) {
+	var svg = document.getElementById("svg")
+	svg.innerHTML = ""
+	var square = document.createElementNS(xmlns, "rect");
+	square.setAttributeNS(null, "width", wid*50);
+	square.setAttributeNS(null, "height", hei*50);
+	square.setAttributeNS(null, "x", 0);
+	square.setAttributeNS(null, "y", 0);
+	svg.appendChild(square);
+	if (red) {
+		square.setAttributeNS(null, "fill", "red");
+	}
+	svg.innerHTML += give_path(berry[0]*50-15, berry[1]*50-10, fruit_color)
+	list.forEach((el, ind) => {
+		if (ind != 0) {
+			var square2 = document.createElementNS(xmlns, "rect");
+			square2.setAttributeNS(null, "fill", color_stripes);
+			square2.setAttributeNS(null, "width", size-10);
+			square2.setAttributeNS(null, "height", size-10);
+			square2.setAttributeNS(null, "x", (el[0]+list[ind-1][0])/2*50+5);
+			square2.setAttributeNS(null, "y", (el[1]+list[ind-1][1])/2*50+5);
+			svg.appendChild(square2)
+		} 
+		var square = document.createElementNS(xmlns, "rect");
+		square.setAttributeNS(null, "fill", color_main);
+		square.setAttributeNS(null, "width", size-10);
+		square.setAttributeNS(null, "height", size-10);
+		square.setAttributeNS(null, "x", el[0]*50+5);
+		square.setAttributeNS(null, "y", el[1]*50+5);
+		svg.appendChild(square)
+		
+		if (list.length-1 == ind) {
+			square.setAttributeNS(null, "fill", color_head)
+			if (list.length > 1) {
+				var diff = [el[0] - list[list.length-2][0], el[1] - list[list.length-2][1]]
+			}
+			else {
+				var diff = [0, 0]
+			}
+			// eyes
+			if (diff[1] == -1 || diff[0] == -1) {
+				var eye1 = document.createElementNS(xmlns, "rect");
+				eye1.setAttributeNS(null, "fill", color_stripes);
+				eye1.setAttributeNS(null, "width", 5);
+				eye1.setAttributeNS(null, "height", 5);
+				eye1.setAttributeNS(null, "x", el[0]*50+10);
+				eye1.setAttributeNS(null, "y", el[1]*50+10);
+				svg.appendChild(eye1)
+			}
+			if (diff[0] == 1 || diff[1] == -1 || eq(diff, [0,0])) {
+				var eye2 = document.createElementNS(xmlns, "rect");
+				eye2.setAttributeNS(null, "fill", color_stripes);
+				eye2.setAttributeNS(null, "width", 5);
+				eye2.setAttributeNS(null, "height", 5);
+				eye2.setAttributeNS(null, "x", el[0]*50+10+25);
+				eye2.setAttributeNS(null, "y", el[1]*50+10);
+				svg.appendChild(eye2)
+			}
+			if (diff[0] == 1 || diff[1] == 1 || eq(diff, [0,0])) {
+				var eye3 = document.createElementNS(xmlns, "rect");
+				eye3.setAttributeNS(null, "fill", color_stripes);
+				eye3.setAttributeNS(null, "width", 5);
+				eye3.setAttributeNS(null, "height", 5);
+				eye3.setAttributeNS(null, "x", el[0]*50+10+25);
+				eye3.setAttributeNS(null, "y", el[1]*50+10+25);
+				svg.appendChild(eye3)
+			}
+			if (diff[1] == 1 || diff[0] == -1) {
+				var eye4 = document.createElementNS(xmlns, "rect");
+				eye4.setAttributeNS(null, "fill", color_stripes);
+				eye4.setAttributeNS(null, "width", 5);
+				eye4.setAttributeNS(null, "height", 5);
+				eye4.setAttributeNS(null, "x", el[0]*50+10);
+				eye4.setAttributeNS(null, "y", el[1]*50+10+25);
+				svg.appendChild(eye4)
+			}
+		}
+	})
+}
+function eq(l1, l2) {
+	return l1[0] == l2[0] && l1[1] == l2[1]
+}
+class Game {
+	constructor (st, speed) {
+		this.pause = false
+		this.score = 0
+		this.dir_queue = []
+		this.dir_hist = []
+		this.st = st
+		this.noclip = false
+		this.speed = speed
+		this.body = [st, [st[0]-1, st[1]]]
+		this.berry = [Math.floor(Math.random() * (wid - 2))+1, Math.floor(Math.random() * (hei - 1))]
+	}
+	up() {
+		if (this.pause) {this.pause = false}
+		if (this.dir_queue.length == 0 || !eq(this.dir_queue[this.dir_queue.length-1],[0,-1])){
+			this.dir_queue.push([0,-1])
+		}
+	}
+	down() {
+		if (this.pause) {this.pause = false}
+		if (this.dir_queue.length == 0 || !eq(this.dir_queue[this.dir_queue.length-1],[0,1])){
+			this.dir_queue.push([0,1])
+		}
+	}
+	left() {
+		if (this.pause) {this.pause = false}
+		if (this.dir_queue.length == 0 || !eq(this.dir_queue[this.dir_queue.length-1],[-1,0])){
+			this.dir_queue.push([-1,0])
+		}
+	}
+	right() {
+		if (this.pause) {this.pause = false}
+		if (this.dir_queue.length == 0 || !eq(this.dir_queue[this.dir_queue.length-1],[1,0])){
+			this.dir_queue.push([1,0])
+		}
+	}
+	reset() {
+		console.log("The snake has died!")
+		if (document.getElementById("p_name").value != "") {
+			send_score(document.getElementById("p_name").value, this.score, true)
+		}
+		get_leaderboard()
+		draw(this.body, this.berry, true)
+		this.score = 0
+		this.dir_queue = []
+		this.dir_hist = []
+		this.body = [this.st, [this.st[0]-1, this.st[1]]]
+		this.berry = [Math.floor(Math.random() * (wid - 2))+1, Math.floor(Math.random())]
+	}
+	move() {
+		// Dont do anything if paused!
+		if (this.pause) {return}
+		
+		// Leaderboard score posting and receiving every 6 ticks
+		counter++
+		if (counter == 6) {
+			counter = 0
+			if (document.getElementById("p_name").value != "") {
+				if (this.score != 0) {send_score(document.getElementById("p_name").value, this.score)}
+				get_leaderboard()
+			}
+		}
+		if (duha) {change_color(true)} // Rainbow
+		var place = this.body[this.body.length-1] // The place where the snake is before the move
+		
+		// Direction history (to know where to go if there are invalid moves) and queue (to be able to queue your moves)
+		if (this.dir_queue.length != 0) {
+			if (this.dir_queue.length > 1){
+				this.dir_hist.push(this.dir_queue[0])
+				if (this.dir_hist.length > 2) {
+					this.dir_hist.shift()
+				}
+				this.dir_queue.shift()
+			}
+			place = [place[0]+this.dir_queue[0][0], place[1]+this.dir_queue[0][1]] // sets the place to be the place wheere the snake should move
+		}
+		var temp = JSON.parse(JSON.stringify(this.body)) // the body before any changes
+		this.body.shift() // removes the end of the tail
+		if ((!(place[0] < 0 || place[0] >= wid || place[1] < 0 || place[1] >= hei || // checking if off the map
+		(is_in(place, this.body) && this.dir_queue.length != 0)) || // checks if it intersects with itself
+		this.body.length > 1 && eq(this.body[this.body.length-2], place)) || // moving into itself
+		this.noclip) { 
+			if (this.body.length > 1 && eq(this.body[this.body.length-2], place)) { // invalid move check
+				place = [place[0]-this.dir_queue[0][0]+this.dir_hist[1][0], place[1]-this.dir_queue[0][1]+this.dir_hist[1][1]] // correct the invalid move by using a different one from the history
+				this.dir_queue[0] = this.dir_hist[1]
+				if (place[0] < 0 || place[0] >= wid || place[1] < 0 || place[1] >= hei) {
+					this.body.push(place)
+					this.reset()
+					return
+				}
+			}
+			this.body.push(place)
+			if (eq(place, this.berry)) {
+				this.body = JSON.parse(JSON.stringify(temp))
+				this.body.push(place)
+				if (this.score != 177) {
+					while (true) {
+						var temp = [Math.floor(Math.random() * (wid - 1)), Math.floor(Math.random() * (hei - 1))]
+						if (!is_in(temp, this.body)) {
+							this.berry = temp
+							this.score++
+							if (document.getElementById("p_name").value != "") {
+								if (this.score != 0) {send_score(document.getElementById("p_name").value, this.score)}
+								get_leaderboard()
+							}
+							break
+						}
+					}
+				}
+				else {
+				    this.score++
+				    send_score(document.getElementById("p_name").value, this.score)
+				}
+			}
+			document.getElementById("score").innerHTML = "SCORE: "+this.score
+			draw(this.body, this.berry)
+		}
+		else {
+			this.body.push(place)
+			this.reset()
+		}
+		
+	}
+	start() {
+		this.inter = setInterval(this.move.bind(this), this.speed)
+	}
+}
+
+document.getElementById("p_name").addEventListener("change", (event) => {
+	document.cookie = "had_name="+event.target.value+";path='/had/'"
+	document.getElementById("error").innerHTML = ""
+})
+game = new Game([1,0], 300)
+document.addEventListener("keydown", (event) => {
+	if (["ArrowUp", "ArrowDown", "ArrowRight", "ArrowLeft"].indexOf(event.key) >= 0 && document.getElementById("p_name").value == "") {
+		document.getElementById("error").innerHTML = " Type your name in first!"
+	}
+	else {
+		if (event.key == "ArrowUp") {game.up()}
+		else if (event.key == "ArrowDown") {game.down()}
+		else if (event.key == "ArrowRight") {game.right()}
+		else if (event.key == "ArrowLeft") {game.left()}
+	}
+	if (event.key == "c") {change_color()}
+	else if (event.key == "d") {
+		if (duha) {
+			c_index = last_ind-1
+			if (c_index == -1) {
+				c_index = color_variations.length-1
+			}
+			change_color()
+		} else {
+			last_ind = c_index
+		}
+		duha = !duha
+	}
+	else if (event.key == "p") {
+		game.pause = !game.pause
+	}
+	else if (event.key == "n" && document.getElementById("p_name").value == "stepan") {
+		game.noclip = !game.noclip
+	}
+})
+game.start()
+
+const sendHttpRequest = (method, url, data) => {
+  const promise = new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open(method, url);
+
+    xhr.responseType = 'json';
+	
+    if (data) {
+		xhr.setRequestHeader('Content-Type', 'application/json');
+    }
+
+    xhr.onload = () => {
+		if (xhr.status >= 400) {
+			reject(xhr.response);
+		} else {
+			resolve(xhr.response);
+		}
+    };
+
+    xhr.onerror = () => {
+		reject('Something went wrong!');
+    };
+
+    xhr.send(JSON.stringify(data));
+  });
+  return promise;
+};
+
+function get_leaderboard() {
+	var failed = 0;
+	const send = () => {
+		sendHttpRequest('POST', 'http://lovec741.pythonanywhere.com/leaderboard', {
+		})
+			.then(responseData => {
+				if (responseData["done"] != false) {
+					var lead = responseData["lead"].split("\n")//.replace(//g, "<br>")
+					var lead_new = ""
+					for (var i = 0; i < lead.length; i++) {
+						if (lead[i].split(" ").length == 3) {
+							lead_new += "<b>"+lead[i]+"</b><br>"
+						}
+						else {lead_new += lead[i]+"<br>"}
+					}
+					console.log(lead_new)
+					lead_new = lead_new.replace("stepan ", "<span style='color: red; text-shadow: black 0px 0px 3px'>stepan </span>")
+					document.getElementById("lead").innerHTML = lead_new
+				}
+				else {
+					console.log("FAILED")
+				}
+			})
+			.catch(err => {
+				failed += 1
+				if (failed != 10) {
+					send()
+				}
+				else {
+					console.log("CAN'T REACH SERVER")
+				}
+				console.log(err);
+			});
+	}
+	send()
+};
+function send_score(name, score, death=false) {
+	var failed = 0;
+	const send = () => {
+		sendHttpRequest('POST', 'http://lovec741.pythonanywhere.com/add_score', {
+			name: name,
+			score: score,
+			death: death
+		})
+			.then(responseData => {
+				if (responseData["done"] != false) {
+					
+				}
+				else {
+					console.log("FAILED")
+				}
+			})
+			.catch(err => {
+				failed += 1
+				if (failed != 10) {
+					send()
+				}
+				else {
+					console.log("CAN'T REACH SERVER")
+				}
+				console.log(err);
+			});
+	}
+	send()
+};
+get_leaderboard()
+</script>
+</body>
+</html>

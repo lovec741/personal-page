@@ -1,0 +1,41 @@
+<style>
+.stop-select{
+   user-select: none; 
+   -webkit-user-select: none;
+   -moz-user-select: none;
+   -ms-user-select: none;
+}
+body > div{
+	visibility: collapse;
+	display: none;
+	box-shadow: none;
+}
+div#not {
+	visibility: visible;
+	display: block;
+}
+</style>
+<div id="not">
+<p style="font-size: 2em; width: 100%; font-family: arial" class="stop-select">Napište sem četnosti (oddělená čárkou):</p>
+<input type="text" id="1" style="font-size: 3em; width: 100%; margin-bottom: 3%"/>
+<p style="font-size: 2em; width: 100%; font-family: arial" class="stop-select">Napište sem celkový počet:</p>
+<input type="text" id="2" style="font-size: 3em; width: 100%; margin-bottom: 3%"/>
+<button onclick="calc()" style="font-size: 3em">Vypočítat</button>
+<p id="res" style="font-size: 2em; width: 100%; height: 10%; font-family: arial"></p>
+</div>
+<script>
+const inp1 = document.getElementById("1")
+const inp2 = document.getElementById("2")
+const res = document.getElementById("res")
+
+function calc() {
+	str = ""
+	temp = inp1.value.replace(/ /g, "")
+	temp = temp.split(",")
+	sum = parseFloat(inp2.value)
+	temp.forEach(el=>{
+		str += el+"/"+inp2.value+"="+parseFloat((parseFloat(el)/sum).toFixed(5)).toString()+" rel. četnost "+parseFloat((parseFloat(el)/sum*100).toFixed(3)).toString()+"%"+"<br>"
+	})
+	res.innerHTML = str
+}
+</script>

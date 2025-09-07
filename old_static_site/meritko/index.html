@@ -1,0 +1,102 @@
+<html>
+<head>
+<style>
+	body {
+		overflow: hidden;
+		font-family: helvetica;
+	}
+	body > div{
+		visibility: collapse;
+		display: none;
+		box-shadow: none;
+	}
+	div#not {
+		visibility: visible;
+		display: block;
+	}
+</style>
+</head>
+<b>Na mapě <input id="namape" type="text"></input><br>
+V reálu <input id="vrealu" type="text"></input><br>
+1 : <input id="pomer" type="text"></input></b><br>
+<button onclick="check()">Calc</button>
+<button onclick="mapa.value=''; real.value=''; pomer.value=''">Clear</button>
+<p id="error"></p>
+<script>
+var mapa = document.getElementById("namape")
+var real = document.getElementById("vrealu")
+var pomer = document.getElementById("pomer")
+var error = document.getElementById("error")
+function check() {
+	error.innerHTML = ""
+	if (mapa.value != "") {
+		var tmapa = mapa.value.split(" ")
+		var map = null
+		if (tmapa[1] == "cm") {
+			map = tmapa[0]/100
+		}
+		else if (tmapa[1] == "km") {
+			map = tmapa[0]*1000
+		}
+		else if (tmapa[1] == "m"){
+			map = tmapa[0]
+		}
+		else {
+			error.innerHTML = "Špatná jednotka! Buď jednotka chybí nebo to není jedna z podporovaných (cm, m, km) a nebo není oddělena mezerou.<br>"
+		}
+	}
+	if (real.value != "") {
+		var treal = real.value.split(" ")
+		var rea = null
+		if (treal[1] == "cm") {
+			rea = treal[0]/100
+		}
+		else if (treal[1] == "km") {
+			rea = treal[0]*1000
+		}
+		else if (treal[1] == "m"){
+			rea = treal[0]
+		}
+		else {
+			error.innerHTML = "Špatná jednotka! Buď jednotka chybí nebo to není jedna z podporovaných (cm, m, km) a nebo není oddělena mezerou.<br>"
+		}
+	}
+	console.log("X", rea, map)
+	if (real.value != "" && mapa.value != "" && pomer.value == "") {
+		if (rea != null && map != null) {
+			pomer.value = rea/map
+		}
+	}
+	else if (real.value != "" && mapa.value == "" && pomer.value != "") {
+		if (rea/pomer.value < 0.5) {
+			mapa.value = (rea/pomer.value*100)+" cm"
+		}
+		else if (rea/pomer.value > 999) {
+			mapa.value = (rea/pomer.value/1000)+" km"
+		}
+		else {
+			mapa.value = (rea/pomer.value)+" m"
+		}
+		
+	}
+	else if (real.value == "" && mapa.value != "" && pomer.value != "") {
+		if (map*pomer.value < 0.5) {
+			real.value = (map*pomer.value*100)+" cm"
+		}
+		else if (map*pomer.value > 999) {
+			real.value = (map*pomer.value/1000)+" km"
+		}
+		else {
+			real.value = (map*pomer.value)+" m"
+		}
+	}
+	else if (real.value != "" && mapa.value != "" && pomer.value != "") {
+		error.innerHTML += "Všechna pole jsou už vyplněná! Pole které chcete dovypočítat musí být prázdné!"
+	}
+	else {
+		error.innerHTML += "Moc málo polí pro vypočítání!"
+	}
+}
+</script>
+</body>
+</html>

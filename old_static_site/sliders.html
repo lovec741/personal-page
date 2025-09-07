@@ -1,0 +1,122 @@
+<html>
+<head>
+<title>Color Sliders</title>
+<style>
+body {
+font-family: arial;
+background: black;
+color: white;
+};
+#cont {border: solid white 1px;}
+body > div{
+			visibility: collapse;
+			display: none;
+			box-shadow: none;
+		}
+		div#not {
+			visibility: visible;
+			display: block;
+		}
+</style>
+</head>
+<body>
+<div id="not">
+<input type="range" min="0" max="255" value="0" id="c1r"><input type="range" min="0" max="255" value="0" id="c1g"><input type="range" min="0" max="255" value="0" id="c1b"><div id="c1"></div><br>
+<input type="range" min="0" max="255" value="0" id="c2r"><input type="range" min="0" max="255" value="0" id="c2g"><input type="range" min="0" max="255" value="0" id="c2b"><div id="c2"></div><br>
+<br>
+<input type="range" min="0" max="255" value="0" id="c3r"><input type="range" min="0" max="255" value="0" id="c3g"><input type="range" min="0" max="255" value="0" id="c3b"><div id="c3"></div><br>
+<input type="range" min="0" max="255" value="0" id="c4r"><input type="range" min="0" max="255" value="0" id="c4g"><input type="range" min="0" max="255" value="0" id="c4b"><div id="c4"></div><br>
+Mix factor X:<input type="range" min="0" max="100" id="s1" oninput="mix()">
+Mix factor Y:<input type="range" min="0" max="100" id="s2" oninput="mix()">
+<div id="c" style="border: solid white 1px; width:30px; height:30px; display: inline-block"></div>
+<div id="cont"></div>
+</div>
+<script>
+var preview = 50;
+var tilesize = 8;
+const xs = document.getElementById("s1")
+const ys = document.getElementById("s2")
+const mixed = document.getElementById("c")
+var cols = ["r", "g", "b"]
+var colvals = [[0,0,0],[0,0,0],[0,0,0],[0,0,0]]
+set_cols = ()=>{
+for (var i = 0; i < 4; i++) {
+	document.getElementById("c"+(i+1)).style = "background:rgb("+colvals[i][0]+","+colvals[i][1]+","+colvals[i][2]+"); width:30px; height:30px; display:inline-block; border: solid white 1px;"
+}
+var xfac = 0;
+var yfac = 0;
+var r = 0;
+var g = 0;
+var b = 0;
+var text = "";
+var pointer = [Math.min(Math.round(preview*(xs.value/100)), preview-1), Math.min(Math.round(preview*(ys.value/100)), preview-1)]
+console.log(pointer)
+for (var y = 0; y < preview; y++) {
+	for (var x = 0; x < preview; x++) {
+		xfac = x/preview
+		yfac = y/preview
+		var r = (colvals[0][0]*(1-xfac)+colvals[1][0]*xfac)*(1-yfac)+(colvals[2][0]*(1-xfac)+colvals[3][0]*xfac)*yfac
+		var g = (colvals[0][1]*(1-xfac)+colvals[1][1]*xfac)*(1-yfac)+(colvals[2][1]*(1-xfac)+colvals[3][1]*xfac)*yfac
+		var b = (colvals[0][2]*(1-xfac)+colvals[1][2]*xfac)*(1-yfac)+(colvals[2][2]*(1-xfac)+colvals[3][2]*xfac)*yfac
+		if (x == pointer[0] && y == pointer[1]) {
+			var bordercol = 0
+			if ((r+g+b)/3 < 128) {
+				bordercol = 255
+			}
+			text += "<div class='wb' id='"+x+","+y+"' style='background: rgb("+r+","+g+","+b+"); width:"+(tilesize-2)+"px; height:"+(tilesize-2)+"px; border: rgb("+bordercol +","+bordercol +","+bordercol+") solid 1px; display:inline-block'"
+		}
+		else {
+			text += "<div class='' id='"+x+","+y+"' style='background: rgb("+r+","+g+","+b+"); width:"+tilesize+"px; height:"+tilesize+"px; display:inline-block'"
+		}
+		text += "onmousedown='move_border(\""+(x+","+y)+"\", true)'></div>"
+	}
+	text += "<br>";
+}
+document.getElementById("cont").innerHTML = text;
+}
+move_border = (id, set=false) => {
+if (set) {
+	xs.value = parseInt(id.split(",")[0])/preview*100
+	ys.value = parseInt(id.split(",")[1])/preview*100
+	if (xs.value == Math.round(100-1/preview*100)) {
+		xs.value = 100
+	}
+	if (ys.value == Math.round(100-1/preview*100)) {
+		ys.value = 100
+	}
+	mix()
+}
+var temp1 = document.getElementsByClassName("wb")[0]
+var border = temp1.style.border
+temp1.style.border = "none"
+temp1.style.width = tilesize+"px"
+temp1.style.height = tilesize+"px"
+temp1.classList.remove("wb")
+
+var temp2 = document.getElementById(id)
+temp2.style.border = border
+temp2.style.width = (tilesize-2)+"px"
+temp2.style.height = (tilesize-2)+"px"
+temp2.classList.add("wb")
+}
+set_cols()
+mix = ()=>{
+const xfac = xs.value/100
+const yfac = ys.value/100
+
+move_border(Math.min(Math.round(preview*xfac), preview-1)+","+Math.min(Math.round(preview*yfac), preview-1))
+
+var r = (colvals[0][0]*(1-xfac)+colvals[1][0]*xfac)*(1-yfac)+(colvals[2][0]*(1-xfac)+colvals[3][0]*xfac)*yfac
+var g = (colvals[0][1]*(1-xfac)+colvals[1][1]*xfac)*(1-yfac)+(colvals[2][1]*(1-xfac)+colvals[3][1]*xfac)*yfac
+var b = (colvals[0][2]*(1-xfac)+colvals[1][2]*xfac)*(1-yfac)+(colvals[2][2]*(1-xfac)+colvals[3][2]*xfac)*yfac
+mixed.style.background = "rgb("+r+","+g+","+b+")"
+}
+mix()
+for (var i = 1; i < 5; i++) {
+	for (var c = 0; c < 3; c++) {
+		document.getElementById("c"+i+cols[c]).addEventListener("input", (e)=>{colvals[parseInt(e.target.id[1])-1][cols.indexOf(e.target.id[2])] = parseInt(e.target.value); set_cols(); mix()})
+	}
+}
+</script>
+</body>
+</html>

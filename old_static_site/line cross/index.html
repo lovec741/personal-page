@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Line Cross Detection</title>
+	<style type="text/css">
+		canvas {
+			background: white;
+			max-height: 100%;
+			max-width: 100%;
+		}
+		body {
+			font-family: arial;
+			width: 100vw;
+			height: 100vh;
+			margin: 0;
+			background: blue;
+			transition: background 0.3s;
+		}
+		#can {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			top: 0;
+		}
+		#con {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			position: absolute;
+			top: 0;
+			width: 100%;
+		}
+		#con1 {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			position: absolute;
+			top: 10vh;
+			width: 100%;
+		}
+		#p {
+			border-radius: 5px;
+			z-index: 3;
+			position: absolute;
+			background: inherit;
+			top: 0;
+			left: 0;
+			color: white;
+			font-size: 2em;
+			margin: 10px;
+			padding: 0px 5px;
+		}
+		#s {
+			border-radius: 5px;
+			z-index: 3;
+			background: blue;
+			color: white;
+			font-size: 2em;
+			margin: 10px;
+			padding: 0px 5px;
+		}
+		button {
+			background: rgb(100,100,100);
+			border: solid rgb(150,150,150);
+			transition: background 0.2s, border 0.2s;
+			outline: none;
+			color: white;
+		}
+		#sur {
+			z-index: 3;
+			position: absolute;
+			top: 0;
+			right: 0;
+			font-size: 1.5em;
+			margin: 10px;
+			padding: 0px 5px;
+		}
+		#ng {
+			z-index: 3;
+			visibility: hidden;
+			font-size: 1.5em;
+			margin: 10px;
+			padding: 0px 5px;
+		}
+		#sur:hover, #yes:hover, #no:hover, #ng:hover{
+			background: rgb(150,150,150);
+			border: solid rgb(200,200,200);
+		}
+		#sur:active, #yes:active {
+			background: rgb(255,0,0);
+			border: solid rgb(255,100,100);
+		}
+		#no:active {
+			background: rgb(255,255,255);
+			border: solid rgb(100,100,100);
+		}
+		#ng:active {
+			background: rgb(100,255,100);
+			border: solid rgb(80,150,80);
+		}
+		#sure {
+			z-index: 3;
+			position: absolute;
+			visibility: hidden;
+			background: black;
+			top: 25vh;
+			left: 25vw;
+			width: 50vw;
+			height: 50vh;
+			opacity: 0;
+			transition: opacity 0.5s, visibility 0.5s;
+		}
+		#surtext {
+			position: static;
+			text-align: center;
+			font-size: 2em;
+			color: white;
+		}
+		#yes {
+			position: fixed;
+			left: 28vw;
+			width: 20vw;
+			font-size: 2em;
+			bottom: 30vh;
+		}
+		#no {
+			position: fixed;
+			right: 28vw;
+			width: 20vw;
+			font-size: 2em;
+			bottom: 30vh;
+		}
+	</style>
+</head>
+<body>
+	<div id="sure">
+		<p id="surtext">Are you sure you want to Surrender?</p>
+		<button id="yes" onclick="document.getElementById('sure').style.visibility = 'hidden'; document.getElementById('sure').style.opacity = '0'; surrender()">Yes</button>
+		<button id="no" onclick="document.getElementById('sure').style.visibility = 'hidden'; document.getElementById('sure').style.opacity = '0'">No</button>
+	</div>
+	<p id="p">P1</p>
+	
+	<button id="sur" onclick="document.getElementById('sure').style.visibility = 'visible'; document.getElementById('sure').style.opacity = '1'">Surrender</button>
+	<div id="con">
+		<p id="s">0:0</p>
+	</div>
+	<div id="con1">
+		<button id="ng" onclick="reset_it()">New Game</button>
+	</div>
+	
+	<div id="can">
+		<canvas></canvas>
+	</div>
+	<script src="code.js"></script>
+</body>
+</html>

@@ -1,0 +1,265 @@
+<html>
+<head>
+<title>Šimonova stránka!</title>
+<style>
+body > div{
+	visibility: collapse;
+	display: none;
+	box-shadow: none;
+}
+div#not {
+	visibility: visible;
+	display: block;
+	margin: 5vh 30vw;
+}
+body {
+	background: black;
+	font-family: arial;
+	color: white;
+	margin: 0;
+	width: 100%;
+	-webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+body::-webkit-scrollbar {
+  display: none;
+}
+.cont {
+	position: relative;
+	width: 100%;
+	background: gray;
+	padding: 0.5em 1em;
+	margin-bottom: 1em;
+	transition: background 2s, border-radius 1s, box-shadow 0.1s, color 0.3s, max-height 5s;
+	z-index: 2;
+	overflow: hidden;
+	max-height: 3em;
+}
+.cont:hover {
+	max-height: 100em;
+}
+p {
+	margin-bottom: 1.5em
+}
+.cont:hover {
+	border-radius: 15px;
+	background: rgb(100,100,100)
+}
+.cont:active {
+	color: black;
+}
+a {
+	color: white;
+	text-decoration: none;
+	z-index: 2;
+}
+#canvas {
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	z-index: 1;
+	cursor: none;
+}
+#sp {
+	visibility: hidden;
+	position: fixed;
+	top: 0px;
+	left: 0px;
+}
+</style>
+</head>
+<body>
+	<div id="not">
+		<input type="range" id="sp" min="0" max="100"><br>
+		<canvas id="canvas"></canvas>
+		<h1>Šimonova stánka!</h1>
+		<p>Vítejte na mé stránce tady je pár mých projektů:</p>
+		<br>
+		<div id="calc">
+		<h2><u>Kalkulačky:</u></h2>
+		<a href="troj/index.html">
+			<div class="cont">
+				<p><b>Trojčlenka</b></p>
+				<p>Prográmek na trojčlenku.</p>
+			</div>
+		</a>
+		<a href="kvadr/index.html">
+			<div class="cont">
+				<p><b>Kvadratické rovnice</b></p>
+				<p>Řešič kvadratických rovnic.</p>
+			</div>
+		</a>
+		<a href="prevod/index.html">
+			<div class="cont">
+				<p><b>Převaděč jednotek</b></p>
+				<p>Do prvního políčka napište co chcete převést (PŘ: 10m) a do druhého políčka napište jednotku na kterou to chcete převést (cm).</p>
+			</div>
+		</a>
+		<a href="ch calc/index.html">
+			<div class="cont">
+				<p><b>Kalkulátor elektronové konfigurace prvku</b></p>
+				<p>Zjistí vám elektronovou konfiguraci prvku.</p>
+			</div>
+		</a>
+		<a href="meritko/index.html">
+			<div class="cont">
+				<p><b>Počítač měřítka</b></p>
+				<p>Vypočte měřítko z velikosti na mapě vs velikosti v reálu.</p>
+			</div>
+		</a>
+		<a href="num/index.html">
+			<div class="cont">
+				<p><b>Rozkladač čísel</b></p>
+				<p>Řekne vám rozklad, nejmenší společný násobek a největší společný dělitel čísel které zadáte.</p>
+			</div>
+		</a>
+		<a href="cetnost.html">
+			<div class="cont">
+				<p><b>Četnosti</b></p>
+				<p>Jednoduchá kalkulačka četností</p>
+			</div>
+		</a>
+		<br>
+		</div>
+		<div id="games">
+		<h2><u>Hry:</u></h2>
+		<a href="ryby/index.htm">
+			<div class="cont">
+				<p><b>Hra Jdeme na ryby</b></p>
+				<p>Desková hra kde váším cílem je získat co nejvíce rybích peněz, zeleně jsou vyznačena políčka na která můžete šlápnout. Nahoře uprostřed vidíte informace, které vám mohou pomoci při hře.</p>
+			</div>
+		</a>
+		<a href="had/index.html">
+			<div class="cont">
+				<p><b>Hra Had</b></p>
+				<p>Webová verzi klasické hry had. Zadejte přezdívku a začněte hrát pomocí šipek. Zmáčkněte C pro změnění barevného tématu.</p>
+			</div>
+		</a>
+		<a href="car game/index.html">
+			<div class="cont">
+				<p><b>Hra s autíčky</b></p>
+				<p>Hra pro dva hráče jeden svoje autíčko ovládá WASD (a boost pomocí mezery) a druhý šipkami (a boost pomocí 0). Cílem je dostat co nejvíc bodů, když najedete na kolečko tak ho "obsadíte" a získáváte z něho body.</p>
+			</div>
+		</a>
+		<a href="gol/index.html">
+			<div class="cont">
+				<p><b>Game of Life</b></p>
+				<p>Simulace GoL v prohlížeči.</p>
+			</div>
+		</a>
+		<a href="line cross/index.html">
+			<div class="cont">
+				<p><b>Sprouts</b></p>
+				<p>Hra sprouts.</p>
+			</div>
+		</a>
+		<br>
+		</div>
+		<div id="other">
+		<h2><u>Jiné:</u></h2>
+		<a href="cut/index.html">
+			<div class="cont">
+				<p><b>Ořezávač obrázků</b></p>
+				<p>Vyberte 4 body a vyřízne vám z toho nový obrázek.</p>
+			</div>
+		</a>
+		<a href="mandel/index.html">
+			<div class="cont">
+				<p><b>Prohlížeč mandelbrot setu</b></p>
+				<p>Sotva funkční prohlížeč mandelbrot setu, taháním myší se posouváte, kolečkem přibližujete, kliknutím prostředního tlačítka načtete ve větším rozlišení a kliknutím na J načtete julius set na tomto místě. (načítaní ve větším rozlišení může chvíli trvat)</p>
+			</div>
+		</a>
+		<a href="find criminal/index.html">
+			<div class="cont">
+				<p><b>Implementace Rossmovi rovnice v prohlížeči</b></p>
+				<p>Program na zjištění nejpravděpodobnějšího místa bydliště zločince podle místo jeho napáchaných činů. Pro začátek výpočtu naklikejte několik bodů (míst činu).</p>
+			</div>
+		</a>
+		<a href="http://lovec741.pythonanywhere.com/random_names">
+			<div class="cont">
+				<p><b>Generátor náhodných jmen</b></p>
+				<p>Pokusí se vytvořit náhodná česká jména a přijmení.</p>
+			</div>
+		</a>
+		<a href="http://lovec741.pythonanywhere.com/art">
+			<div class="cont">
+				<p><b>Čárkovač obrázku</b></p>
+				<p>Upraví obrázek na čárkovaný obrázek.</p>
+			</div>
+		</a>
+		<a href="collisions/index.html">
+			<div class="cont">
+				<p><b>Nárazy s kruhy</b></p>
+				<p>Jednoduchá fyzikální simulace, klikněte pro vytvoření nehybného kolečka, klikněte a táhněte směrem kam chcete aby se kolečko hýbalo pro vytvoření pohyblivého kolečka. Začne mít problémy když proběhne 2 nebo více nárazů do jednoho kolečka zároveň.</p>
+			</div>
+		</a>
+		<a href="maze.html">
+			<div class="cont">
+				<p><b>Generátor bludišť</b></p>
+				<p>Pomocí sliderů vyberte velikost a zakliknutím checkboxu si nechte vygenerovat řešení.</p>
+			</div>
+		</a>
+		<a href="tabule/index.html">
+			<div class="cont">
+				<p><b>WIP Online tabule</b></p>
+				<p>Sdílená tabule na kreslení, zmáčkněte C pro smázání.</p>
+			</div>
+		</a>
+		<a href="robot/index.html">
+			<div class="cont">
+				<p><b>Pohyby pro robota</b></p>
+				<p>Kreslící program na tvoření pohybů pro kreslícího robota.</p>
+			</div>
+		</a>
+		<a href="key.html">
+			<div class="cont">
+				<p><b>Program pro kreslení pomocí klávesnice</b></p>
+				<p>Přejeďte prstem přes klávesnici a uvidíte vaše pohyby před vámi.</p>
+			</div>
+		</a>
+		<a href="w.html">
+			<div class="cont">
+				<p><b>Prográmek na trénování ve psaní</b></p>
+				<p>Vygeneruje pár náhodných znaků a vy je napíšete, dole vidíte počet napsaných textů, průměrný čas dokončení jednoho textu a v procentech počet napsaných textů kde jste museli opravit chybu.</p>
+			</div>
+		</a>
+		<a href="sliders.html">
+			<div class="cont">
+				<p><b>Program na mixování barev</b></p>
+				<p>Upravte RGB hodnoty každé barvy a pak se podívejte na jejich mix.</p>
+			</div>
+		</a>
+		</div>
+	</div>
+<script>
+let colors = ["rgb(100,0,255)", "red", "rgb(100,255,100)"]
+let conts = document.getElementsByClassName("cont")
+let style = document.createElement('style')
+style.id = "outlines"
+document.getElementsByTagName('head')[0].appendChild(style)
+style = document.getElementById("outlines")
+function generate(i) {
+	let css = `#c${i}:hover {box-shadow: 0 0 0 2px ${colors[Math.floor(Math.random()*colors.length)]};}`
+	if (style.styleSheet) {
+		style.styleSheet.cssText = css
+	} else {
+		style.appendChild(document.createTextNode(css))
+	}
+}
+for (let i = 0; i < conts.length; i++) {
+	conts[i].id = "c"+i
+	generate(i)
+}
+for (let i = 0; i < conts.length; i++) {
+	conts[i].addEventListener("mouseleave", e => {
+		generate(e.srcElement.id.slice(1))
+	})
+}
+</script>
+	<script src="code.js"></script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Canvas testing</title>
+	<style type="text/css">
+		body {
+			background: black;
+			color: white;
+			margin: 0;
+			font-family: arial;
+		}
+		canvas {
+			background: white;
+		}
+		.color {
+			width: 20px;
+			height: 20px;
+			border: 2px solid gray;
+			display: inline-block;
+		}
+		#crime {
+			background: black;
+		}
+		#highest {
+			background: rgb(255,100,255);
+		}
+		#high {
+			background: hsl(0, 100%, 50%);
+		}
+		#low {
+			background: hsl(120, 100%, 50%);
+		}
+		#very_low {
+			background: hsl(200, 100%, 50%);
+		}
+		
+		p {
+			display: inline-block;
+			margin-left: 20px;
+			margin-top: 3px;
+		}
+		#legend {
+			position: fixed;
+			margin-top: 10px;
+			margin-right: 10px;
+			padding-top: 10px;
+			padding-left: 10px;
+			padding-right: 20px;
+			background: black;
+			right: 10px;
+			top: 10px;
+			border-radius: 0.3em;
+		}
+		button {
+			position: fixed;
+			font-size: 2em;
+			color: white;
+			font-family: arial;
+			background: black;
+			border-radius: 0.3em;
+			outline: none;
+		}
+		#undo {
+			padding: 0 0 0.2em 0;
+			bottom: 25px;
+			right: calc(20px + 2em);
+			width: 2em;
+			height: 1.5em;
+		}
+		#clear {
+			bottom: 25px;
+			right: 20px;
+			font-weight: 900;
+			width: 2em;
+			height: 1.5em;
+		}
+		body > div{
+			visibility: collapse;
+			display: none;
+			box-shadow: none;
+		}
+		div#not {
+			visibility: visible;
+			display: block;
+		}
+	</style>
+</head>
+<body>
+	<div id="not">
+	<canvas id="canvas"></canvas>
+	<div id="legend">
+		<div class="color" id="crime"></div><p>Crimes</p><br>
+		<p>Likelihood:</p><br>
+		<div class="color" id="highest"></div><p>Highest</p><br>
+		<div class="color" id="high"></div><p>High </p><br>
+		<div class="color" id="low"></div><p>Low</p><br>
+		<div class="color" id="very_low"></div><p>Very Low</p>
+	</div>
+	<button id="undo" onclick="crimes_x.pop(); crimes_y.pop(); draw_map()">←</button>
+	<button id="clear" onclick="crimes_x = []; crimes_y = []; draw_map()">×</button>
+	</div>
+	<script src="code.js"></script>
+</body>
+</html>

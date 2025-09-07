@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>GoL</title>
+	<style>
+	#b1 {background: red}
+	#b2 {background: green}
+	#b3 {background: red}
+	body > div{
+		visibility: collapse;
+		display: none;
+		box-shadow: none;
+	}
+	div#not {
+		visibility: visible;
+		display: block;
+	}
+	</style>
+</head>
+<body>
+<div id="not">
+<button onclick="if (stop) {repeat(); document.getElementById('b1').style.background = 'green'; document.getElementById('b1').innerHTML = 'STOP'} else {stop_repeat(); document.getElementById('b1').style.background = 'red'; document.getElementById('b1').innerHTML = 'START'}" id="b1">START</button>
+<button onclick="clear_it()">CLEAR</button>
+<button onclick="tool = !tool; if (!tool) {document.getElementById('b2').style.background = 'red'} else {document.getElementById('b2').style.background = 'green'}" id="b2">CHANGE TOOL</button>
+<button onclick="wide_tool = !wide_tool; if (!wide_tool) {document.getElementById('b3').style.background = 'red'} else {document.getElementById('b3').style.background = 'green'}" id="b3">WIDE TOOL</button>
+<button onclick="change_delay(1000); document.getElementById('t1').value = delay">Very Slow</button>
+<button onclick="change_delay(300); document.getElementById('t1').value = delay">Slow</button>
+<button onclick="change_delay(100); document.getElementById('t1').value = delay">Normal</button>
+<button onclick="change_delay(10); document.getElementById('t1').value = delay">Fast</button>
+<button onclick="change_delay(0); document.getElementById('t1').value = delay">Very Fast</button>
+<input type="text" id="t1" value="10"/>
+<button onclick="change_delay(parseInt(document.getElementById('t1').value))">Change delay</button>
+<button onclick="save()" id="b4">SAVE</button>
+<button onclick="load()">LOAD</button>
+<button onclick="add_random_points()">ADD RANDOM POINTS</button>
+<br>
+<canvas id="canvas"></canvas>
+</div>
+<script src="gol.js"></script>
+</body>
+</html>

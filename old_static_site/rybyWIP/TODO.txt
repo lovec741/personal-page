@@ -1,0 +1,33 @@
+Player amount selection: DONE
+Tutorial/Help pop ups: 
+If players are forced to be on one tile the forced player has to end the game
+You have to move every turn
+If you have to give away a fish coin but yo don't have one, you become in debt, that means that when you get another fish coin you have to give it away until your debt is paid
+
+Tiles:
+G Ryby - When revealed no fish are gathered by the player who revealed it, its only the next time he steps on the tile
+N Voda - Do nothing
+N Přikázaný směr - Tells you where you have to go, if there are multiple options you can choose
+B Rákos - Skip 1 turn
+G Vodník - move to any tile on the board -> turns to water for the rest of the game
+G Vodní víla - you can take a fish coin from any revealed Ryby and move to any REVEALED tile on the board -> turns to water for the rest of the game
+B Vítr - moves you 3 tiles in the direction its facing, if you are moved outside of the playing field you have to skip the same amount of turns as you are tiles outside of the playing field
+B Zlomená udice - Skip 3 turns
+B Čáp - You have to return 1 (or 3 if you got here by the Příkázaný směr or Vítr tile) fish coin to a Ryby tile
+G Dobrá návnada - You can use this tile to move to the nearest Ryby tile, but you can use it later if you don't want to use it now, it has a single use
+B Rybář usnul - Skip 3 turns, give every other player a fish coin
+
+Deciding if I will make this multiplayer
+
+Things to be implemented:
+Show where you can move: WIP
+Next players turn pop-up:
+Game tutorial pop ups:
+Fish coin balance, show individual coins or debt:
+Skipping turns when you are on a skip tile, Skip counter:
+Giving away your coins to other players when forced by Řybář usnul tile:
+Storing the Dobrá návnada tile and being able to use it later
+Choosing fish coin menu for Vodní víla and diving away your coins to a Ryby tile when forced by Čáp menu
+Choosing where to go for Vodní víla, Vodník and Dobrá návnada
+
+Set player names when starting game and create players, edit the playing so it show name and not just color

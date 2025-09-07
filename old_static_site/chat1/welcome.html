@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Login and Register</title>
+	<style type="text/css">
+		body {
+			color: rgb(230, 230, 230);
+			background: black;
+			margin: 0;
+			font-family: arial;
+		}
+		button {
+			cursor: pointer;
+		}
+		#create_group {
+			visibility: hidden;
+		}
+		#join_group {
+			visibility: hidden;
+		}
+		[style*="z-index:99"] {
+			visibility: collapse;
+		}
+		::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+		  color: rgb(200, 200, 200);
+		  opacity: 1; /* Firefox */
+		}
+
+		:-ms-input-placeholder { /* Internet Explorer 10-11 */
+		  color: rgb(200, 200, 200);
+		}
+
+		::-ms-input-placeholder { /* Microsoft Edge */
+		  color: rgb(170, 170, 170);
+		}
+		button, input {
+			outline: none;
+		}
+		input[type="text"], input[type="password"]{
+			color: rgb(230, 230, 230);
+			background: rgb(80, 80, 80);
+			left: 30%;
+			position: fixed;
+			padding: 0 1vw;
+			width: 38%;
+			height: 8%;
+			bottom: 55%;
+			font-size: 2em;
+			border: 0 none;
+			border-radius: 3px;
+		}
+		.header{
+			text-align: center;
+			color: rgb(230, 230, 230);
+			left: 10%;
+			position: fixed;
+			width: 80%;
+			height: 5%;
+			font-size: 4em;
+			border: 0 none;
+			border-radius: 3px;
+		}
+		#create_text {
+			bottom: 70%;
+		}
+		#join_text {
+			bottom: 70%;
+		}
+		#welcome_text {
+			bottom: 60%;
+		}
+		#create_group_button, #join_group_button, #back1, #back2, #joinbutton, #createbutton{
+			color: rgb(230, 230, 230);
+			background: rgb(80, 80, 80);
+			left: 30%;
+			position: fixed;
+			width: 40%;
+			height: 8%;
+			font-size: 2em;
+			border: 0 none;
+			border-radius: 3px;
+		}
+		#create_group_button {
+			bottom: 25%;
+		}
+		#join_group_button {
+			bottom: 40%;
+		}
+		#back1, #back2 {
+			bottom: 15%;
+		}
+		#joinbutton {
+			bottom: 40%;
+		}
+		#createbutton {
+			bottom: 40%;
+		}
+		#welcome, #join_group, #create_group {
+			position: fixed;
+			width: 80%;
+			height: 80%;
+			top: 13%;
+			left: 10%;
+			background: rgb(100, 100, 100);
+			border-radius: 15px;
+		}
+		#welcome {
+			visibility: visible;
+		}
+		#create_group_button:hover, #join_group_button:hover, #back1:hover, #back2:hover, #joinbutton:hover, #createbutton:hover {
+			background: rgb(70, 70, 70);
+			color: rgb(220, 220, 220);
+		}
+		#create_group_button:active, #join_group_button:active, #back1:active, #back2:active, #joinbutton:active, #createbutton:active {
+			background: rgb(50, 50, 50);
+			color: rgb(200, 200, 200);
+		}
+		#joinproblem, #createproblem {
+			text-align: center;
+			left: 25%;
+			position: fixed;
+			width: 50%;
+			height: 8%;
+			bottom: 22.5%;
+			font-size: 1.5em;
+		}
+		body > div{
+			visibility: collapse;
+			display: none;
+			box-shadow: none;
+			
+		}
+		div#not {
+			visibility: visible;
+			display: block;
+		}
+	</style>
+</head>
+<body><div id="not">
+	<!-- add invites, in future add public and private groups -->
+	<div id="welcome">
+		<p id="welcome_text" class="header"></p>
+		<button id="create_group_button">Create a new group.</button>
+		<button id="join_group_button">Join a group.</button>
+	</div>
+	<div id="create_group">
+		<p id="create_text" class="header">Create a Group</p>
+		<input type="text" id="createtext" placeholder="Group Name" autocomplete="off">
+		<p id="createproblem"></p>
+		<button id="createbutton">Create Group</button>
+		<button id="back1">Back</button>
+	</div>
+	<div id="join_group">
+		<p id="join_text" class="header">Join a Group</p>
+		<input type="text" id="jointext" placeholder="Group Code" autocomplete="off">
+		<p id="joinproblem"></p>
+		<button id="joinbutton">Join Group</button>
+		<button id="back2">Back</button>
+	</div>
+	<script src="welcome.js" type="text/javascript"></script>
+</div></body>
+</html>

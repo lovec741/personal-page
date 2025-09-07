@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Graphing calc attempt</title>
+	<style type="text/css">
+		body {
+			background: black;
+			color: white;
+			font-family: arial;
+			margin: 10px 0 0 3px;
+		}
+		#canvas {
+			border: 3px solid gray;
+		}
+		span {
+			font-size: 2em;
+		}
+		input[type=text], button {
+			font-size: 2em;
+			background: black;
+			color: white;
+			font-family: arial;
+			border-radius: 10px;
+			border: 2px solid gray;
+			outline: none;
+		}
+		.er {
+			color: red;
+		}
+		button {
+			width: 1.5em;
+			height: 1.5em;
+			font-weight: bold;
+		}
+		#zoom_control {
+			position: absolute;
+			top: 0.1em;
+			right: 0.1em;
+		}
+		body > div{
+			visibility: collapse;
+			display: none;
+			box-shadow: none;
+		}
+		div#not {
+			visibility: visible;
+			display: block;
+		}
+		#funcs > div {
+			margin-bottom: 1em;
+		}
+		#rem_func {
+			visibility: hidden;
+		}
+	</style>
+</head>
+<body>
+	<div id="not">
+		<canvas id="canvas"></canvas><br>
+		<div id="zoom_control">
+			<button id="zoom_in">+</button><br>
+			<button id="zoom_out">-</button>
+		</div>
+		<div id="funcs">
+			<div id="1">
+				<span>y = </span><input type="text" placeholder="x" class="func_inp" oninput="graph_all()"></input>
+				<span class="er"></span><br>
+			</div>
+		</div>
+		<div id="func_edit">
+			<button id="add_func">+</button>
+			<button id="rem_func">-</button>
+		</div>
+	</div>
+	<script src="code.js"></script>
+</body>
+</html>

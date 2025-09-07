@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8"/>
+	<title>ZjednoduĹˇenĂ­ laborek</title>
+	<style type="text/css">
+		body {
+			background: black;
+			color: white;
+			font-family: arial;
+			margin: 50px;
+			font-size: 2em;
+		}
+		span {
+			margin: 0.1em;
+		}
+		p {
+			font-size: 0.5em;
+			margin-top: 0.1em;
+			margin-bottom: 0
+		}
+		input {
+			font-size: 1em;
+			margin: 0.5em 0;
+		}
+		input[type=checkbox] {
+			width: 1em;
+			height: 1em;
+			margin: 0.3em;
+		}
+		.gray {
+			background: rgb(100,100,100);
+			color: white;
+		}
+		.cont {
+			background: rgb(50,50,50);
+			color: white;
+			text-align: center;
+			padding-top: 10px;
+			border-radius: 5px;
+		}
+		button {
+			border-radius: 5px;
+			margin: 0.5em auto;
+			font-size: 1em;
+		}
+		body > div{
+			visibility: collapse;
+			display: none;
+			box-shadow: none;
+		}
+		div#not {
+			visibility: visible;
+			display: block;
+		}
+		#limitace {
+			
+			border-radius: 15px;
+			padding: 30px;
+		}
+		th, td {
+			padding: 5px;
+			border: 1px solid gray;
+			font-size: 0.5em;
+		}
+		#log_table {
+			margin-left: auto;
+    		margin-right: auto;
+		}
+		textarea {
+			background: black;
+			color: white;
+			font-family: arial;
+			font-size: 0.7em;
+			margin-top: 10px;
+			margin-bottom: 10px;
+			width: 90%;
+			height: 9.8em;
+			border-radius: 5px;
+		}
+		#report_status {
+			color: greenyellow;
+		}
+	</style>
+</head>
+<body>
+<div id="not">
+	<h3 style="margin-bottom: 10px;">PĹ™evadÄ›ÄŤ ze 2. na 1. osobu</h3>
+	<p>(z "udÄ›lejte" na "udÄ›lal jsem", pro zjednoduĹˇenĂ­ vypracovĂˇnĂ­ referĂˇtĹŻ)</p>
+	<p style="font-size: 1em">LIMITACE: <button onclick="flip_limitations_visibility()" id="limitace_button" class="gray">UkĂˇzat</button></p>
+	<div id="limitace" style="display: none" class="gray">
+		<p><b>Co udÄ›lĂˇ program:</b> (nevĂ­ Ĺľe musĂ­ dĂˇt pĹ™ed nÄ›jakĂˇ dalĹˇĂ­ slova)</p>
+		<ul>
+			<p>"NĂˇslednÄ› <b>roztok jsem</b> pĹ™efiltroval."</p>
+			<p>"VzniklĂ˝ oxid mÄ›ÄŹnatĂ˝ <b>na filtraÄŤnĂ­m papĂ­Ĺ™e jsme</b> nechali volnÄ› uschnout."</p>
+		</ul>
+		
+		<p><b>SprĂˇvnÄ› mĂˇ bĂ˝t:</b></p>
+		<ul>
+			<p>"NĂˇslednÄ› <b>jsem roztok</b> pĹ™efiltroval."</p>
+			<p>"VzniklĂ˝ oxid mÄ›ÄŹnatĂ˝ <b>jsme na filtraÄŤnĂ­m papĂ­Ĺ™e</b> nechali volnÄ› uschnout."</p>
+		</ul>
+		<br>
+		<p><b>Co udÄ›lĂˇ program:</b> (nevĂ­ jestli dĂˇt jsme/jsem pĹ™ed, za nebo nedat vĹŻbec <br><b><i>(proto to dĂˇ do hranatĂ˝ch zĂˇvorek aby to bylo jasnĂ˝ Ĺľe je to potĹ™eba zkontrolovat))</i></b></p>
+		<ul>
+			<p>"NavĂˇĹľili jsme 2g modrĂ© skalice a <b>[rozpustili]</b> je v 50ml vody."</p>
+		</ul>
+		<p><b>SprĂˇvnÄ› mĂˇ bĂ˝t:</b></p>
+		<ul>
+			<p>"NavĂˇĹľili jsme 2g modrĂ© skalice a <b>rozpustili jsme</b> je v 50ml vody."</p>
+		</ul>
+	</div>
+	<br>
+	<div class="cont">
+		<form id="convert_form">
+			<span>Zadejte text: </span><br><textarea id="input" placeholder="" required></textarea><br>
+			
+			<span>VrĂˇtit v mnoĹľnĂ©m ÄŤĂ­sle: </span><input type="checkbox" id="mn"><br>
+			<button type="submit">PĹ™evĂ©st</button><br>
+		</form>
+	</div><br>
+	<div class="cont">
+		<h5 style="margin: 10px">VĂ˝sledky:</h5>
+		<span>Log: <button onclick="flip_log_visibility()" id="log_button" class="gray">UkĂˇzat</button></span><br>
+		<div id="log" style="display: none;">
+			<table id="log_table">
+			</table>
+			<br>
+		</div>
+		<span>PĹ™evedeno: </span><br><textarea id="result" placeholder=""></textarea><br>
+	</div><br>
+	<div class="cont" >
+		<form id="report_form">
+			<h4>NahlĂˇsit chybnĂ˝ pĹ™evod</h4>
+			<span>Sloveso s kterĂ˝m je problĂ©m: </span><br><input id="report_verb" placeholder="napĹ™: udÄ›lejte" required/><br>
+			<span>ChybnĂˇ Ăşprava kterou dostĂˇvĂˇm: </span><br><input id="report_verb_incorrect" placeholder="napĹ™: udÄ›letul jsem" required/><br>
+			<span>Jak by to mÄ›lo bĂ˝t sprĂˇvnÄ›: </span><br><input id="report_verb_correct" placeholder="napĹ™: udÄ›lal jsem" required/><br>
+			<span>PoznĂˇmka: (nepovinnĂ©)</span><br><textarea id="report_note" placeholder="napĹ™: WTF? ProÄŤ mi to vyhodilo 'udÄ›letul'???"></textarea><br>
+			<span id="report_status"></span><br>
+			<button type="submit">NahlĂˇsit chybu</button><br>
+		</form>
+	</div>
+	<script src="code.js"></script>
+</div>
+</body>
+</html>

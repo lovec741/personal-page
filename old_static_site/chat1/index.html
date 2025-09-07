@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Chat</title>
+	<link href="style.css" rel="stylesheet" type="text/css" />
+</head>
+<body><div id="not">
+	<div id="problem"> 
+		<p id="problemtext">Unable to reach server.</p>
+		<button id="pbutton" onclick="document.getElementById('problem').style.visibility = 'hidden'">OK</button>
+	</div>
+		
+	<div id="groups">
+		<input id="groupjoin" type="submit" value="Join">
+		<input id="groupcreate" type="submit" value="Create">
+		<div id="grouplinks">
+			<input class="groupselect" id="g1" type="submit" value="GRoup1"><input class="groupleave" id="g1" type="submit" value="Leave">
+			<input class="groupselect" id="g2" type="submit" value="group1"><input class="groupleave" id="g2" type="submit" value="Leave">
+			<input class="groupselect" id="g3" type="submit" value="group1"><input class="groupleave" id="g3" type="submit" value="Leave">
+			<input class="groupselect" id="g4" type="submit" value="group1"><input class="groupleave" id="g4" type="submit" value="Leave">
+			<input class="groupselect" id="g5" type="submit" value="group1"><input class="groupleave" id="g5" type="submit" value="Leave">
+			<input class="groupselect" id="g6" type="submit" value="group1"><input class="groupleave" id="g6" type="submit" value="Leave">
+		</div>
+	</div>
+	
+	<div id="members">
+		<div id="mem1">
+			<input id="invite" type="submit" value="Invite">
+		</div>
+		<div id="mem2">
+			<input id="invite" type="submit" value="Invite">
+			<input id="kickoradmin" type="submit" value="Promote or Demote">
+		</div>
+		<div id="memberlinks">
+			<p class="member" id="1">Peter1</p><p class="admin" id="1"></p><input class="kick" id="1" type="submit" value="Kick"><br>
+			<p class="member" id="1">Peter1</p><p class="admin" id="1">Admin</p><input class="kick" id="1" type="submit" value="Kick"><br>
+			<p class="member" id="1">Peter1</p><p class="admin" id="1"></p><input class="kick" id="1" type="submit" value="Kick"><br>
+			<p class="member" id="1">Peter1</p><p class="admin" id="1"></p><input class="kick" id="1" type="submit" value="Kick"><br>
+			<p class="member" id="1">Peter1</p><p class="admin" id="1"></p><input class="kick" id="1" type="submit" value="Kick"><br>
+			<p class="member" id="1">Peter1</p><p class="admin" id="1"></p><input class="kick" id="1" type="submit" value="Kick"><br>
+			<p class="member" id="1">Peter1</p><p class="admin" id="1">Admin</p><input class="kick" id="1" type="submit" value="Kick"><br>
+			<p class="member" id="1">Peter1</p><p class="admin" id="1"></p><input class="kick" id="1" type="submit" value="Kick"><br>
+			<p class="member" id="1">Peter1</p><p class="admin" id="1"></p><input class="kick" id="1" type="submit" value="Kick"><br>
+			<p class="member" id="1">Peter1</p><p class="admin" id="1"></p><input class="kick" id="1" type="submit" value="Kick"><br>
+		</div>
+	</div>
+	
+	<div id="top">
+		<p id="groupname"></p>
+	</div>
+	<input id="groupbutton" type="submit" value="Groups">
+	<input id="membersbutton" type="submit" value="Members">
+	
+	<div id="text">
+		<p class="name">Peter</p>
+		<p class="message1">Hello!</p>
+		<div class="right"><p class="message2">Hi!</p></div><br><br>
+		<p class="name">Peter</p>
+		<p class="message1">How are you?</p>
+		<p class="message1">How are you now?</p>
+		<p class="name">Peter 12:15</p>
+		<p class="message1">Hello!</p>
+		<div class="right"><p class="message2">Hi!</p></div>
+		<div class="right"><p class="message2">Hdssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss d f  sf s f s fdfgrello!</p></div>
+		<p class="name">Peter</p>
+		<p class="message1">How are you?<br>Becausedddddddddddddddddddddddddddddddddddddddddddddddd I am doing great!</p>
+		<p class="message1">How are you now?</p>
+		<p class="name">Peter</p>
+		<p class="message1">Hello!</p>
+		<div class="right"><p class="message2">Hi!</p></div><br><br>
+		<p class="name">Peter</p>
+		<p class="message1">How are you?</p>
+		<p class="message1">How are you now?</p>
+		<p class="name">Peter</p>
+		<p class="message1">Hello!</p>
+		<div class="right"><p class="message2">Hi!</p></div><br><br>
+		<p class="name">Peter</p>
+		<p class="message1">How are you?</p>
+		<p class="message1">How are you now?</p>
+	</div> 
+	<div id="bottom">
+		<input type="file" id="file" style="display:none" accept="image/*"/>
+		<label for="file"><img id="img_upload" src="image_icon.png"></label>
+		
+		<textarea id="input" placeholder="Type something..." autocomplete="off" maxlength="1000"></textarea>
+		<input id="send" type="submit" value="Send">
+	</div>
+	<div id="black"><p id="blacktext">Choose a group</p></div>
+	<script src="script.js"></script>
+</div></body>
+</html>

@@ -1,0 +1,119 @@
+<html>
+<head>
+<style>
+	body {
+		overflow: hidden;
+		font-family: helvetica;
+	}
+	body > div{
+		visibility: collapse;
+		display: none;
+		box-shadow: none;
+	}
+	div#not {
+		visibility: visible;
+		display: block;
+	}
+</style>
+</head>
+<b>Čísla</b> (oddělená čárkou): <input id="x1" type="text"></input><br>
+<button onclick="check()">Calc</button></b>
+<span id="res"></span>
+<script>
+var x1 = document.getElementById("x1")
+var umn = document.getElementById("umn")
+var res = document.getElementById("res")
+function is_prime(n){
+   if (n <= 1)
+      return false
+   else
+      for (let i=2; i < n; i++)
+         if (n % i == 0)
+            return false
+   return true
+}
+function rozklad(num, text=false) {
+	let n = 2
+	let lst = []
+	while (num > 1) 
+	{
+		if (is_prime(n))
+			if (num % n == 0) {
+				lst.push(n)
+				num /= n
+				n = 1
+			}
+		n++
+	}
+	if (text)
+		return lst.join("×")
+	return lst
+}
+function nejm_nas(nums) {
+	let num1 = rozklad(nums.shift())
+	let num2 = rozklad(nums.shift())
+	console.log(nums)
+	console.log(num1, num2)
+	for (let i=0; i < num1.length; i++)
+	{
+		if (num2[num2.indexOf(num1[i])] != undefined) {
+			num2.splice(num2.indexOf(num1[i]), 1)
+		}
+	}
+	let num = num1.concat(num2)
+	let x = 1
+	for (let i=0; i < num.length; i++) {
+		x *= num[i]
+	}
+	if (nums.length > 0) {
+		x = nejm_nas([x, nums[0]])
+	}
+	return x
+}
+function nejv_del(nums) {
+	let num1 = rozklad(nums.shift())
+	let num2 = rozklad(nums.shift())
+	let de = []
+	for (let i=0; i < num1.length; i++)
+	{
+		if (num2[num2.indexOf(num1[i])] != undefined) {
+			de.push(num2.splice(num2.indexOf(num1[i]),1),1)
+		}
+	}
+	
+	let x = 1
+	for (let i=0; i < de.length; i++) {
+		x *= de[i]
+	}
+	if (nums.length > 0) {
+		x = nejv_del([x, nums[0]])
+	}
+	return x
+}
+function check() {
+	nums = x1.value.replace(/ /g, "").split(",")
+	for (let i = 0; i < nums.length; i++) {
+		nums[i] = parseInt(nums[i])
+	}
+	if (nums[0] != "") {
+		text = "<br><br><b>Rozklady:</b><br>"
+		for (let i = 0; i < nums.length; i++) {
+			text += nums[i] + " = " + rozklad(nums[i], true) + "<br>"
+		}
+		let nas = nejm_nas([...nums])
+		let del = nejv_del([...nums])
+		if (nums.length > 1) {
+			text += "<br><b>Nejmenší společný násobek:</b> "+nas
+			if (rozklad(nas).length > 1) 
+				text += " = "+rozklad(nas,true)
+			text += "<br><br><b>Největší společný dělitel:</b> "+del
+			if (rozklad(del).length > 1) 
+				text += " = "+rozklad(del,true)
+		}
+		res.innerHTML = text
+	}
+	
+}
+</script>
+</body>
+</html>

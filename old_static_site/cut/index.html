@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Canvas testing</title>
+	<style type="text/css">
+		body {
+			font-family: arial;
+			color: white;
+			background: black;
+		}
+		div.canvas {
+			width: 95vw;
+			height: 80vh;
+			overflow: auto;
+			margin-top: 0.5vh; 
+			border: 3px solid gray;
+		}
+		.fixed {
+			right: 10px;
+			top: 10px;
+			position: fixed;
+		}
+		.larger_buttons {
+			width: calc((10vw+10vh)/2);
+			height: calc((10vw+10vh)/2);
+			font-size: calc((10vw+10vh)/4);
+		}
+		.larger_reset_buttons {
+			width: calc((10vw+10vh)*2);
+			height: calc((10vw+10vh)/2);
+			font-size: calc((10vw+10vh)/4);
+		}
+		div.text {
+			font-size: calc((10vw+10vh)/5)
+		}
+		#inp1 {
+			font-size: calc((10vw+10vh)/5);
+			padding: 5px;
+		}
+		.style1{
+		color: white;
+		background: gray;
+		border: none;
+		}
+		#button2{
+			font-size: calc((10vw+10vh)/5);
+			padding: 5px;
+		}
+		#button2:focus { 
+		outline:0 !important; 
+		}
+		#button2:hover {
+			background: rgb(80, 80, 80);
+		}
+		#button2:active {
+			background: rgb(220, 220, 220);
+			color: rgb(80, 80, 80);
+		}
+		[style*="z-index:99"] {
+			visibility: collapse;
+		}
+	</style>
+</head>
+<body>
+	<input style="font-size: calc((10vw+10vh)/4);" type="file" id="file" name="file"></br>
+	<div class="fixed"><button class="larger_reset_buttons" type="submit" id="button1">Reset points</button><button class="larger_buttons" type="submit" id="button+">+</button><button class="larger_buttons" type="submit" id="button-">-</button></div>
+	<div class="canvas"><canvas> </canvas></div></br>
+	<div class="text">Side ratio for the final crop: <input class="style1" type="text" id="inp1" value="0"><br>
+	(0 = auto, A = the ratio of the ISO A series (like A4))<br>
+	Choose from which side to calculate the ratio: <input type="radio" name="main_side" id="rad1"><input type="radio" name="main_side" id="rad2" checked=true><input type="radio" name="main_side" id="rad3"><input type="radio" name="main_side" id="rad4"><br>
+	Full resolution (slower): <input type="checkbox" id="inp2"><br>
+	<button class="style1" type="submit" id="button2">Submit</button>
+	<p id="error"></p></div>
+	<script src="canvas.js"></script>
+</body>
+</html>

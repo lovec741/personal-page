@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Canvas testing</title>
+	<style type="text/css">
+		body {
+			color: white;
+			background: black;
+			margin: 0;
+		}
+		canvas {
+			background: white;
+			display: block;
+			margin-left: auto;
+			margin-right: auto;
+		}
+		.fixed {
+			right: 10px;
+			top: 10px;
+			position: fixed;
+		}
+		.larger_buttons {
+			position: fixed;
+			width: calc((10vw+10vh)/2);
+			height: calc((10vw+10vh)/2);
+			font-size: calc((10vw+10vh)/4);
+		}
+		#ui {
+			display: inherit;
+			visibility: inherit;
+			position: fixed;
+			left: 10px;
+			top: 10px;
+			font-family: arial;
+		}
+		[style*="z-index:99"] {
+			display: none;
+		}
+		div {
+			visibility: collapse;
+			display: none;
+		}
+		div#not {
+			display: block	;
+			visibility: visible;
+		}
+	</style>
+</head>
+<body>
+	<div id="not">
+	<canvas> </canvas>
+	<div id="ui">
+		<p id="zoom">Z:1</p>
+		<p id="resolution">R:100</p>
+		<p id="itter">IT:300</p>
+		<p id="darkn">D:0.9</p>
+	</div>
+	<button class="larger_buttons" type="submit" id="button+">+</button><button class="larger_buttons" type="submit" id="button-">-</button></div>
+	<script src="code.js"></script>
+	</div>
+</body>
+</html>

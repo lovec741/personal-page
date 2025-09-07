@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Collisions</title>
+	<style>
+		body {
+			background: black;
+			overflow: hidden;
+			font-family: helvetica;
+		}
+		canvas {
+			border: solid white 2px;
+		}
+		body > div{
+			visibility: collapse;
+			display: none;
+			box-shadow: none;
+		}
+		div#not {
+			visibility: visible;
+			display: block;
+		}
+	</style>
+</head>
+<body>
+<div id="not">
+<input type="range" id="sp" min="0" max="100"><br>
+<canvas id="canvas"></canvas>
+</div>
+<script src="code.js"></script>
+</body>
+</html>

@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Canvas testing</title>
+	<style type="text/css">
+		body {
+			font-family: arial;
+			color: black;
+			background: white;
+		}
+		body > div{
+			visibility: collapse;
+			display: none;
+			box-shadow: none;
+		}
+		div#not {
+			visibility: visible;
+			display: block;
+		}
+		.clr_plt {
+			flex: 0 0 auto;
+			height: 100%;
+			margin-bottom: 5px;
+			margin-left: 55px;
+			display: flex;
+			flex-direction: column;
+			align-items: left;
+			justify-content: flex-start;
+		}
+		.row {
+			height: 24px;
+			flex: 0 0 auto;
+			display: flex;
+			flex-direction: row;
+			justify-content: flex-start;
+			width: auto
+		}
+		.row > div {
+			width: 24px;
+			height: 24px;
+			cursor: pointer;
+			flex: 0 0 auto;
+			box-sizing: border-box;
+			overflow:auto;
+		}
+		#prev {
+			height: 48px; 
+			width: 48px; 
+			background: black;
+			float:left; 
+			outline: black solid 1px
+		}
+		#bck_set {
+		}
+	</style>
+</head>
+<body>
+	<div id="not">
+	<div id="prev"></div>
+	<div class="clr_plt"><div class="row"></div><div class="row"></div></div>
+	<button id="bck_set" onclick='set_board_background(colors[col]); canvas.style.background = colors[col]; bck_just_set=true'>SET AS BACKGROUND</button><br>
+	<!--<button onclick="get_all_moves()">Get New Data</button><button id="switch" onclick="switch_interval()">Start Periodic New Data</button><br>-->
+	<canvas style="border: black solid 1px"></canvas></div>
+<script>
+const canvas = document.querySelector("canvas")
+const c = canvas.getContext("2d")
+canvas.height = 600
+canvas.width = 1200
+/*c.beginPath()
+c.strokeStyle = "rgba("+255+", "+255+", "+255+", 255)"
+c.rect(0,0,canvas.width,canvas.height)
+c.stroke()*/
+var x = 0
+var y = 0
+var down = false
+var id = c.createImageData(1,1)
+var d = id.data
+var moves = []
+let last_moves = []
+let last_moves_size = 0
+var inter = null
+const switch_button = document.getElementById("switch") 
+let colors = ["#FFFFFF", "#000000", "#C1C1C1", "#4C4C4C", "#EF130B", "#740B07", "#FF7100", "#C23800", "#FFE400", "#E8A200", "#00CC00", "#005510", "#00B2FF", "#00569E", "#231FD3", "#0E0865", "#A300BA", "#550069", "#D37CAA", "#A75574", "#A0522D", "#63300D"]
+let rows = document.getElementsByClassName("row")
+let prev = document.getElementById("prev")
+console.log(rows)
+for (let i = 0; i < colors.length; i++) {
+	if (i%2 == 0) {
+		rows[0].innerHTML += "<div onclick='col="+i+"; prev.style.background=\""+colors[i]+"\"' style='background: "+colors[i]+"'></div>"
+	}
+	else {
+		rows[1].innerHTML += "<div onclick='col="+i+"; prev.style.background=\""+colors[i]+"\"' style='background: "+colors[i]+"'></div>"
+	}
+}
+let col = 1
+let wid = 10
+let drcol = 1
+let drwid = 10
+let last = []
+let bck_just_set = false
+let just_cleared = false
+const RGB_HEX = /^#?(?:([\da-f]{3})[\da-f]?|([\da-f]{6})(?:[\da-f]{2})?)$/i;
+const hex2RGB = str => { // function by bathos
+  const [ , short, long ] = String(str).match(RGB_HEX) || [];
+
+  if (long) {
+    const value = Number.parseInt(long, 16);
+    return [ value >> 16, value >> 8 & 0xFF, value & 0xFF ];
+  } else if (short) {
+    return Array.from(short, s => Number.parseInt(s, 16)).map(n => (n << 4) | n);
+  }
+};
+
+function set_pixel(x, y, color) {
+	d[0] = color[0]
+	d[1] = color[1]
+	d[2] = color[2]
+	d[3] = 255
+	console.log(x, y, d)
+	c.putImageData(id, x, y)
+}
+/*
+function set_pixel_pssst(x, y) {
+	d[0] = 0
+	d[1] = 0
+	d[2] = 0
+	d[3] = 255
+	c.putImageData(id, x, y)
+}
+
+function draw_line(x1, y1, x2, y2) {
+	// I stole this!
+	let x, y, dx, dy, dx1, dy1, px, py, xe, ye, i;
+    // Calculate line deltas
+    dx = x2 - x1;
+    dy = y2 - y1;
+    // Create a positive copy of deltas (makes iterating easier)
+    dx1 = Math.abs(dx);
+    dy1 = Math.abs(dy);
+    // Calculate error intervals for both axis
+    px = 2 * dy1 - dx1;
+    py = 2 * dx1 - dy1;
+    // The line is X-axis dominant
+    if (dy1 <= dx1) {
+        // Line is drawn left to right
+        if (dx >= 0) {
+            x = x1; y = y1; xe = x2;
+        } else { // Line is drawn right to left (swap ends)
+            x = x2; y = y2; xe = x1;
+        }
+        set_pixel(x, y); // Draw first pixel
+        // Rasterize the line
+        for (i = 0; x < xe; i++) {
+            x = x + 1;
+            // Deal with octants...
+            if (px < 0) {
+                px = px + 2 * dy1;
+            } else {
+                if ((dx < 0 && dy < 0) || (dx > 0 && dy > 0)) {
+                    y = y + 1;
+                } else {
+                    y = y - 1;
+                }
+                px = px + 2 * (dy1 - dx1);
+            }
+            // Draw pixel from line span at
+            // currently rasterized position
+            set_pixel(x, y);
+        }
+    } else { // The line is Y-axis dominant
+        // Line is drawn bottom to top
+        if (dy >= 0) {
+            x = x1; y = y1; ye = y2;
+        } else { // Line is drawn top to bottom
+            x = x2; y = y2; ye = y1;
+        }
+        set_pixel(x, y); // Draw first pixel
+        // Rasterize the line
+        for (i = 0; y < ye; i++) {
+            y = y + 1;
+            // Deal with octants...
+            if (py <= 0) {
+                py = py + 2 * dx1;
+            } else {
+                if ((dx < 0 && dy<0) || (dx > 0 && dy > 0)) {
+                    x = x + 1;
+                } else {
+                    x = x - 1;
+                }
+                py = py + 2 * (dx1 - dy1);
+            }
+            // Draw pixel from line span at
+            // currently rasterized position
+            set_pixel(x, y);
+        }
+    }
+}
+*/
+function switch_interval() {
+	if (inter == null) {
+		inter = setInterval(get_all_moves, 100);
+		switch_button.innerHTML = "Stop Periodic New Data"
+	}
+	else {
+		clearInterval(inter)
+		inter = null
+		switch_button.innerHTML = "Start Periodic New Data"
+	}
+}
+function draw_circle(x, y, width, color) {
+	console.log(x, y, width, color)
+	c.beginPath()
+	c.arc(x, y, width/2.2, 0, 2 * Math.PI, false)
+	c.fillStyle = color
+	c.fill()
+	c.lineWidth = 1
+	//c.strokeStyle = colors[col]
+	c.stroke()
+}
+function draw_lines(lst, width, color) {
+	draw_circle(lst[0][0], lst[0][1], width, color)
+	c.lineWidth = width
+	c.beginPath()
+	c.moveTo(lst[0][0],lst[0][1])
+	for (let i = 1; i < lst.length; i++) {
+		c.lineTo(lst[i][0],lst[i][1])
+	}
+	c.strokeStyle = color
+	c.stroke()
+	draw_circle(lst[lst.length-1][0], lst[lst.length-1][1], width, color)
+	console.log(lst[lst.length-1][0], lst[lst.length-1][1])
+}
+function draw_line(x1, y1, x2, y2, width, color) {
+	c.beginPath()
+	c.moveTo(x1, y1)
+	c.lineTo(x2, y2)
+	c.strokeStyle = color
+	c.lineWidth = width
+	c.stroke()
+}
+function start_line(x, y) {
+	moves.push(["l", wid, col])
+	moves.push([x, y])
+	last = [x, y]
+}
+function add_line(x, y) {
+	draw_line(last[0], last[1], x, y, wid, colors[col])
+	moves.push([x, y])
+	last = [x, y]
+}
+function draw_all_moves(lst) { // fix the incorrectness
+	let line = false
+	let lines = []
+	let draw_cir = false
+	if (typeof(lst[0][0]) == "number") {
+		line = true
+	}
+	for (let i = 0; i < lst.length; i++) {
+		if (lst[i][0] == "f") {
+			fill(lst[i][1], lst[i][2], colors[lst[i][3]], 2000)
+		}
+		else if (line) {
+			if (lst[i][0] == "e") {
+				draw_lines(lines, drwid, colors[drcol])
+				lines = []
+				line = false
+			}
+			else {
+				lines.push([lst[i][0], lst[i][1]])
+			}
+		}
+		else if (lst[i][0] == "l") {
+			line = true
+			drwid = lst[i][1]
+			drcol = lst[i][2]
+			draw_cir = true
+		}
+	}
+	if (line) {
+		draw_lines(lines, drwid, colors[drcol])
+	}
+}
+canvas.addEventListener("mousemove", onMove, false);
+function onMove(event){
+	const rect = canvas.getBoundingClientRect()
+	last_x = x
+	last_y = y
+	x = Math.floor(event.clientX - rect.left)
+	y = Math.floor(event.clientY - rect.top)
+	if (down) {
+		add_line(x, y)
+	}
+}
+setInterval(send, 200);
+
+function send() {
+	
+	add_draw_moves(moves.slice(0,2500))
+	
+	moves = moves.slice(2500)
+	get_all_moves()
+	
+}
+
+/*function create_list(size) {
+	lst = []
+	for (var i = 0; i<size; i++) {
+		lst.push([Math.floor(Math.random() * 10000), Math.floor(Math.random() * 10000)])
+	}
+	return lst
+}*/
+function color_equal(x, y, clr) {
+	var data = c.getImageData(x, y, 1, 1).data;
+	var rgb = [ data[0], data[1], data[2], data[3] ];
+	if (data[3] > 0 && clr[0] == data[0] && clr[1] == data[1] && clr[2] == data[2]){
+		return false
+	}
+	return true
+}
+function fill(sx, sy, color, pixel_limit) {
+	console.log("FILL")
+	var clr = hex2RGB(color)
+    var inst = [[sx, sy]]
+	var pixels = 0
+	set_pixel(sx, sy, clr)
+    while (inst.length != 0) {
+        var i = inst.shift()
+        var x = i[0]
+		var y = i[1]
+        var poss = []
+        if (x != 0 && color_equal(x-1, y, clr)) {
+            inst.push([x-1, y])
+            set_pixel(x-1, y, clr)
+			pixels++
+		}
+        if (y != 0 && color_equal(x, y-1, clr)) {
+            inst.push([x, y-1])
+            set_pixel(x, y-1, clr)
+			pixels++
+		}
+        if (x != canvas.width-1 && color_equal(x+1, y, clr)) {
+            inst.push([x+1, y])
+            set_pixel(x+1, y, clr)
+			pixels++
+		}
+        if (y != canvas.height-1 && color_equal(x, y+1, clr)) {
+            inst.push([x, y+1])
+            set_pixel(x, y+1, clr)
+			pixels++
+		}
+		if (pixels >= pixel_limit) {
+			console.log(pixels)
+			return
+		}
+		console.log(pixels)
+	}
+}
+
+canvas.addEventListener("mousedown", onDown, false);
+function onDown(event){
+	if (event.button == 0) {
+		down = true
+		const rect = canvas.getBoundingClientRect()
+		last_x = x
+		last_y = y
+		x = Math.floor(event.clientX - rect.left)
+		y = Math.floor(event.clientY - rect.top)
+		start_line(x,y)
+		add_line(x, y)
+		//draw_circle(x, y, wid, colors[col])
+	}
+}
+document.addEventListener("keydown", onKey, false);
+function onKey(event){
+	if (event.key == "f") {
+		console.log(x, y)
+		fill(x,y,colors[col],2000)
+		moves.push(["f", x, y, col])
+	}
+	else if (event.key == "c") {
+		c.clearRect(0, 0, canvas.width, canvas.height)
+		canvas.style.background = "white"
+		just_cleared = true
+		clear_board()
+		set_board_background("white")
+		moves = []
+	}
+	else if (event.key == "e") {
+		//something else probably squares
+	}
+	else if (event.key == "b") {
+		col = 1
+		wid = 10
+	}
+	/*else if (event.key == "c") {
+		if (color == 255) {
+			color = 0
+		}
+		else {
+			color = 255
+		}
+	}*/
+}
+canvas.addEventListener("mouseup", onUp, false);
+function onUp(event){
+	//draw_circle(x, y, wid, colors[col])
+	down = false
+	moves.push(["e"])
+}
+const sendHttpRequest = (method, url, data, type='json') => {
+  const promise = new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open(method, url);
+
+    xhr.responseType = type;
+	
+    if (data) {
+		xhr.setRequestHeader('Content-Type', 'application/json');
+    }
+
+    xhr.onload = () => {
+		if (xhr.status >= 400) {
+			reject(xhr.response);
+		} else {
+			resolve(xhr.response);
+		}
+    };
+
+    xhr.onerror = () => {
+		reject('Something went wrong!');
+    };
+
+    xhr.send(JSON.stringify(data));
+  });
+  return promise;
+};
+get_all_moves()
+function add_draw_moves(lst) {
+	//console.log(lst.length)
+	var failed = 0;
+	const send = () => {
+		sendHttpRequest('POST', 'http://lovec741.pythonanywhere.com/add_draw_moves', {
+			moves: lst
+		})
+			.then(responseData => {
+				if (responseData["done"] != false) {
+					//console.log("NICE")
+					
+				}
+				else {
+					console.log("FAILED")
+				}
+			})
+			.catch(err => {
+				failed += 1
+				if (failed != 10) {
+					send()
+				}
+				else {
+					console.log("CAN'T REACH SERVER")
+				}
+				console.log(err);
+			});
+	}
+	send()
+};
+function set_board_background(clr) {
+	var failed = 0;
+	const send = () => {
+		sendHttpRequest('POST', 'http://lovec741.pythonanywhere.com/set_board_background', {
+			clr: clr
+		})
+			.then(responseData => {
+				if (responseData["done"] != false) {
+					//console.log("NICE")
+					
+				}
+				else {
+					console.log("FAILED")
+				}
+			})
+			.catch(err => {
+				failed += 1
+				if (failed != 10) {
+					send()
+				}
+				else {
+					console.log("CAN'T REACH SERVER")
+				}
+				console.log(err);
+			});
+	}
+	send()
+};
+function clear_board() {
+	var failed = 0;
+	const send = () => {
+		sendHttpRequest('POST', 'http://lovec741.pythonanywhere.com/clear_board')
+			.then(responseData => {
+				if (responseData["done"] != false) {
+					console.log("CLEARED!")
+				}
+				else {
+					console.log("FAILED")
+				}
+			})
+			.catch(err => {
+				failed += 1
+				if (failed != 10) {
+					send()
+				}
+				else {
+					console.log("CAN'T REACH SERVER")
+				}
+				console.log(err);
+			});
+	}
+	send()
+	
+};
+var last_size = 0
+function get_all_moves() {
+	var failed = 0;
+	const send = () => {
+		sendHttpRequest('POST', 'http://lovec741.pythonanywhere.com/get_all_moves', {})
+			.then(responseData => {
+				if (responseData["done"] != false) {
+					//console.log(len)
+					var len = responseData["data"].length
+					if (last_size != len && !just_cleared){
+						//c.clearRect(0, 0, canvas.width, canvas.height)
+						if (last_moves_size > len) {
+							c.clearRect(0, 0, canvas.width, canvas.height)
+						}
+						if (len != 0 && moves.length != 0)
+							draw_all_moves(moves)
+						draw_all_moves(responseData["data"])
+						if (bck_just_set) {
+							bck_just_set = false
+						}
+						else {
+							canvas.style.background = responseData["clr"]
+						}
+						//responseData["data"].forEach((el) => {set_pixel_pssst(el[0], el[1])})
+						//last_size = len
+						last_moves_size = len
+					}
+					else if (just_cleared) {just_cleared = false}
+				}
+				else {
+					console.log("FAILED")
+				}
+				
+			})
+			.catch(err => {
+				failed += 1
+				if (failed != 10) {
+					send()
+				}
+				else {
+					console.log("CAN'T REACH SERVER")
+				}
+				console.log(err);
+			});
+	}
+	send()
+	
+};
+</script>
+</body>
+</html>

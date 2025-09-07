@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8"/>
+	<title>Kalkulátor elektronových konfigurací prvku</title>
+	<style type="text/css">
+		body {
+			background: black;
+			color: white;
+			font-family: arial;
+			margin: 50px;
+			font-size: 3em;
+		}
+		span {
+			margin: 0.1em;
+		}
+		p {
+			font-size: 1em;
+			margin-top: 0.1em;
+			margin-bottom: 0
+		}
+		input {
+			font-size: 1em;
+		}
+		input[type=checkbox] {
+			width: 1em;
+			height: 1em;
+			margin: 0.3em;
+		}
+		button {
+			margin: 0.5em auto;
+			font-size: 1em;
+		}
+		body > div{
+			visibility: collapse;
+			display: none;
+			box-shadow: none;
+		}
+		div#not {
+			visibility: visible;
+			display: block;
+		}
+	</style>
+</head>
+<body>
+<div id="not">
+	<h3>Kalkulátor elektronové konfigurace prvku</h3>
+	<form>
+		<span>Zadejte značku prvku: </span><br><input type="text" required id="prvek" placeholder="Prvek"><br>
+		<span>Podle předchozího vzácného plynu: </span><input type="checkbox" checked id="vz"><br>
+		<span>Vykreslit čtverečky: </span><input type="checkbox" id="boxes"><br>
+		<span>Seřadit podle rostoucího n: </span><input type="checkbox" checked id="sort"><br><span>(Pokud není zaškrtlé bude seřazeno podle výstavbového pravidla.)</span><br>
+		<button type="submit">Vypočítat</button>
+	</form>
+	<p id="res"></p>
+	<script src="code.js"></script>
+</div>
+</body>
+</html>
